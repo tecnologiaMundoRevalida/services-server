@@ -26,7 +26,7 @@ class PDFController extends Controller
         }
 
         $pdf = PDF::loadView('resume', ['resumeAll'=> $resumeAll], ['user'=> $user]);
-
-        return $pdf->download('resume.pdf');
+        return $pdf->stream('resume.pdf');
+        // return $pdf->download('resume.pdf');
     }
 }
