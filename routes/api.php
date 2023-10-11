@@ -17,3 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('/send-email-create-user', function(){
+    $user = User::find(322);
+    $password = 12345678;
+    $type = 'user-banco-questoes';
+    dispatch(new App\Jobs\SendEmailCreateUserJob($user, $password,$type));
+    dd('done');
+});

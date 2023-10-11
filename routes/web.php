@@ -25,10 +25,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('send-email-create-user', function(){
-    $user = User::find(322);
-    $password = 12345678;
-    $type = 'user-banco-questoes';
-    dispatch(new App\Jobs\SendEmailCreateUserJob($user, $password,$type));
-    dd('done');
-});
+
