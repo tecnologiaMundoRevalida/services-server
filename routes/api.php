@@ -23,5 +23,5 @@ Route::post('/send-email-create-user', function(){
     $password = 12345678;
     $type = 'user-banco-questoes';
     dispatch(new App\Jobs\SendEmailCreateUserJob($user, $password,$type));
-    dd('done');
+    return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
