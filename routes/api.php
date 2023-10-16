@@ -23,7 +23,6 @@ Route::post('/send-email-create-user', function(Request $request){
     $user = User::find($body["id"]);
     $password = $body["password"];
     $type = $body["type"];
-    dd($body);
     dispatch(new App\Jobs\SendEmailCreateUserJob($user, $password,$type));
     return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
