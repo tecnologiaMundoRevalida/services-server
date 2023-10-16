@@ -18,10 +18,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/send-email-create-user', function(){
-    $user = User::find(322);
-    $password = 12345678;
-    $type = 'user-banco-questoes';
+Route::post('/send-email-create-user', function(Request $request){
+    $body = $request->all();
+    $user = User::find($body["id"]);
+    $password = $body["password"];
+    $type = $body["type"];
+    dd($body);
     dispatch(new App\Jobs\SendEmailCreateUserJob($user, $password,$type));
     return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
