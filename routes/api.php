@@ -26,3 +26,10 @@ Route::post('/send-email-create-user', function(Request $request){
     dispatch(new App\Jobs\SendEmailCreateUserJob($user, $password,$type));
     return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
+
+Route::post('/send-email-simulated', function(Request $request){
+    $body = $request->all();
+    $user = User::find($body["id"]);
+    dispatch(new App\Jobs\SendEmailSimulated($user));
+    return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
+});
