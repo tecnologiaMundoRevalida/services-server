@@ -68,7 +68,7 @@
             <h1 style="text-align:center; font-size: 28px; font-weight: bold">Se após verificar o span e não receber o email você pode acessar diretamente a nossa plataforma clicando no link abaixo, clique em "Esqueceu sua senha?" caso precise mudar a senha.</h1>
         </div>
         <div style="display:flex; justify-content:center">
-                <a class="link" href="https://medtask.medhit.com.br/login" target="_blank">Ir para o site</a>
+                <a class="link" href="https://medtask.com.br" target="_blank">Ir para o site</a>
         </div>
 
         <div style="display:flex; justify-content:center">

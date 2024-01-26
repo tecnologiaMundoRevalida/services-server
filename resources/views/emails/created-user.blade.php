@@ -66,7 +66,7 @@
         </div>
         <div style="display:flex; justify-content:center">
             @if ($type == 'user-banco-questoes')
-                <a class="link" href="https://medtask.medhit.com.br/login" target="_blank">Ir para o site</a>
+                <a class="link" href="https://medtask.com.br" target="_blank">Ir para o site</a>
             @else
                 <a class="link" href="https://medtask.com.br" target="_blank">Ir para o site</a>
             @endif
