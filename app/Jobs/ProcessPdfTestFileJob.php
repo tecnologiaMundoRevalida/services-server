@@ -38,51 +38,48 @@ class ProcessPdfTestFileJob implements ShouldQueue
         foreach($array_questions as $question){
             $thread_id = $this->processThread($question);
             $question_process = $this->retrieveMessage($thread_id);
-            $questions1234[] = $question_process;
-            // $question = $this->saveQuestion($question_process);
+            $question = $this->saveQuestion($question_process);
         }
-        dd($questions1234);
         return response()->json(['message' => 'Questões processadas com sucesso'], 200);
     }
 
-    // public function saveQuestion($question_process){
-    //     $question = Question::create([
-    //         'question' => '<p>' . $question_process["questao"] . '</p>',
-    //         // 'explanation' => '<p>' . $question_process['comentario_da_questao'] . '</p>',
-    //         // 'discursive_response' => $question_process['discursive_response'],
-    //         'is_discursive' => 0,
-    //         'is_new' => 1,
-    //         // 'is_annulled' => $question_process['is_annulled'],
-    //         'active' => 1,
-    //         'test_id' => 153,
-    //     ]);
-    //     $this->saveAlternatives($question_process['alternativas'],$question,$question_process["resposta_correta"]);
-    //     $this->saveMedicineAreaReference($question_process['tag'],$question);
-    //     return $question;
-    // }
+    public function saveQuestion($question_process){
+        $question = Question::create([
+            'question' => '<p>' . $question_process["questao"] . '</p>',
+            // 'explanation' => '<p>' . $question_process['comentario_da_questao'] . '</p>',
+            // 'discursive_response' => $question_process['discursive_response'],
+            'is_discursive' => 0,
+            'is_new' => 1,
+            // 'is_annulled' => $question_process['is_annulled'],
+            'active' => 1,
+            'test_id' => 153,
+        ]);
+        $this->saveAlternatives($question_process['alternativas'],$question,$question_process["resposta_correta"]);
+        $this->saveMedicineAreaReference($question_process['tag'],$question);
+        return $question;
+    }
 
-    // public function saveMedicineAreaReference($tag,$question){
-    //     // $question = Question::find($question_id);
-    //     $question->medicineAreaReference()->create([
-    //         'question_id' => $question->id,
-    //         'medicine_area_id' => $tag
-    //     ]);
-    // }
+    public function saveMedicineAreaReference($tag,$question){
+        $question->medicineAreaReference()->create([
+            'question_id' => $question->id,
+            'medicine_area_id' => $tag
+        ]);
+    }
 
-    // public function saveAlternatives($alternatives,$question,$correct){
-    //     // $question = Question::find($question_id);
-    //     $array_alt_correct = [1 => "A",2 => "B",3 => "C",4 => "D",5 => "E"];
-    //     $i = 1;
-    //     foreach($alternatives as $alternative){
-    //         $question->alternatives()->create([
-    //             'question_id' => $question->id,
-    //             'alternative' => '<p>' . $alternative . '</p>',
-    //             'is_correct' => $array_alt_correct[$i] == $correct ? 1 : 0,
-    //             'active' => 1,
-    //         ]);
-    //         $i++;
-    //     }
-    // }
+    public function saveAlternatives($alternatives,$question,$correct){
+        // $question = Question::find($question_id);
+        $array_alt_correct = [1 => "A",2 => "B",3 => "C",4 => "D",5 => "E"];
+        $i = 1;
+        foreach($alternatives as $alternative){
+            $question->alternatives()->create([
+                'question_id' => $question->id,
+                'alternative' => '<p>' . $alternative . '</p>',
+                'is_correct' => $array_alt_correct[$i] == $correct ? 1 : 0,
+                'active' => 1,
+            ]);
+            $i++;
+        }
+    }
 
     public function processThread($numero_q)
     {
