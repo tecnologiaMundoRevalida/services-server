@@ -15,6 +15,8 @@ class ProcessPdfTestFileJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $fileName;
+    public $client;
     /**
      * Create a new job instance.
      */
