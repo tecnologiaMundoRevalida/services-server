@@ -30,7 +30,21 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public function handle(): void
     {
         $client = OpenAI::client(config('services.openai.api_key'));
-        $this->processPdf($client);
+
+            $fileUploadResponse = $client->files()->upload([
+                'purpose' => 'assistants',
+                'file' => fopen($this->fileName, 'r'), 
+            ]);
+            $fileId = $fileUploadResponse->id;
+            $response = $client->vectorStores()->files()->create(
+                vectorStoreId: 'vs_r3Jym7P2sxlxkHVNk0kiGbTl',
+                parameters: [
+                    'file_id' => $fileId,
+                ]
+            );
+            dd($response);
+        // $this->processPdf($client);
+
     }
 
     public function processPdf($client){
