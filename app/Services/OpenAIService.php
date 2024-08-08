@@ -18,6 +18,21 @@ class OpenAIService
         $this->client = OpenAI::client(config('services.openai.api_key'));
     }
 
+    public function newUploadPdf($fileName){
+        $fileUploadResponse = $this->client->files()->upload([
+            'purpose' => 'assistants',
+            'file' => fopen($fileName, 'r'), 
+        ]);
+        $fileId = $fileUploadResponse->id;
+        dd($fileId);
+        $response = $this->client->vectorStores()->files()->create(
+            vectorStoreId: 'vs_r3Jym7P2sxlxkHVNk0kiGbTl',
+            parameters: [
+                'file_id' => $fileId,
+            ]
+        );
+    }
+
     public function processPdf(){
         $array_questions = [86,87,88];
         $questions1234 = [];
