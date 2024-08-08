@@ -55,6 +55,8 @@ class OpenAIController extends Controller
     {
         $file = $request->file('file');
         $filePath = $file->getPathname();
+        $filePathWithExtension = $filePath . '.' . 'pdf';
+        rename($filePath, $filePathWithExtension);
         $response = $this->openAIService->newUploadPdf($filePath);
         dd($response);
         // $content = utf8_encode(file_get_contents('/Users/eldercarmo/Documents/services-server/public/enare.pdf'));
