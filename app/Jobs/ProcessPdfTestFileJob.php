@@ -104,7 +104,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             // );
 
             // The message or instruction you want to send to the assistant
-        $threadMessage = 'converta a questão '.$numero_q.' do arquivo uerj_2023.pdf em json.';
+        $threadMessage = 'converta a questão '.$numero_q.' do arquivo phpiqngbh.pdf em json.';
 
 
             // Create a thread
