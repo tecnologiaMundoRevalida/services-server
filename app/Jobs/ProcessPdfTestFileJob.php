@@ -16,7 +16,6 @@ class ProcessPdfTestFileJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $fileName;
-    public $client;
     /**
      * Create a new job instance.
      */
@@ -30,16 +29,16 @@ class ProcessPdfTestFileJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->client = OpenAI::client(config('services.openai.api_key'));
-        $this->processPdf();
+        $client = OpenAI::client(config('services.openai.api_key'));
+        $this->processPdf($client);
     }
 
-    public function processPdf(){
+    public function processPdf($client){
         $array_questions = [15,16,17];
         $questions1234 = [];
         foreach($array_questions as $question){
-            $thread_id = $this->processThread($question);
-            $question_process = $this->retrieveMessage($thread_id);
+            $thread_id = $this->processThread($question,$client);
+            $question_process = $this->retrieveMessage($thread_id,$client);
             $question = $this->saveQuestion($question_process);
         }
         // return response()->json(['message' => 'Questões processadas com sucesso'], 200);
@@ -83,9 +82,9 @@ class ProcessPdfTestFileJob implements ShouldQueue
         }
     }
 
-    public function processThread($numero_q)
+    public function processThread($numero_q,$client)
     {
-        $openai = $this->client; 
+        $openai = $client; 
         
 
         // The ID of the pre-created assistant
@@ -150,9 +149,9 @@ class ProcessPdfTestFileJob implements ShouldQueue
         }
     }
 
-    public function retrieveMessage($threadId){
+    public function retrieveMessage($threadId,$client){
         
-        $response = $this->client->threads()->messages()->list(
+        $response = $client->threads()->messages()->list(
             threadId: $threadId
         );
 
