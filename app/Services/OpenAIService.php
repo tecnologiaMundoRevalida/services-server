@@ -24,13 +24,13 @@ class OpenAIService
             'file' => fopen($fileName, 'r'), 
         ]);
         $fileId = $fileUploadResponse->id;
-        dd($fileId);
         $response = $this->client->vectorStores()->files()->create(
             vectorStoreId: 'vs_r3Jym7P2sxlxkHVNk0kiGbTl',
             parameters: [
                 'file_id' => $fileId,
             ]
         );
+        dd($response);
     }
 
     public function processPdf(){
