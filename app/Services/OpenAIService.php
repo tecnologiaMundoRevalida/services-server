@@ -19,7 +19,6 @@ class OpenAIService
     }
 
     public function newUploadPdf($fileName){
-        dd('aki doido');
         $fileUploadResponse = $this->client->files()->upload([
             'purpose' => 'assistants',
             'file' => fopen($fileName, 'r'), 
