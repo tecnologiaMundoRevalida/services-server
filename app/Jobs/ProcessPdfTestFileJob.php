@@ -23,7 +23,6 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public function __construct($fileName)
     {
         $this->fileName = $fileName;
-        $this->client = OpenAI::client(config('services.openai.api_key'));
     }
 
     /**
@@ -31,6 +30,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
      */
     public function handle(): void
     {
+        $this->client = OpenAI::client(config('services.openai.api_key'));
         $this->processPdf();
     }
 
@@ -42,7 +42,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $question_process = $this->retrieveMessage($thread_id);
             $question = $this->saveQuestion($question_process);
         }
-        return response()->json(['message' => 'Questões processadas com sucesso'], 200);
+        // return response()->json(['message' => 'Questões processadas com sucesso'], 200);
     }
 
     public function saveQuestion($question_process){
@@ -146,7 +146,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             
         } catch (\Exception $e) {
             // Handle errors appropriately (log, return error response, etc.)
-            return response()->json(['error' => $e->getMessage()], 500);
+            // return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -181,7 +181,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             return $question;
         } else {
             // \Log::error('Something went wrong; assistant didn\'t respond');
-            dd('Something went wrong; assistant didn\'t respond');
+            // dd('Something went wrong; assistant didn\'t respond');
         }
     }
 }
