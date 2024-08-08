@@ -55,7 +55,7 @@ class OpenAIController extends Controller
     {
         $file = $request->file('file');
         $filePath = $file->getPathname();
-        $response = $this->openAIService->newUploadPdf($filePath . '.pdf');
+        $response = $this->openAIService->newUploadPdf($filePath);
         dd($response);
         // $content = utf8_encode(file_get_contents('/Users/eldercarmo/Documents/services-server/public/enare.pdf'));
         // $prompt = "Leia o pdf no endereço: https://mundo-revalida-checklist-images.s3.amazonaws.com/summary_pdf/AMP+2016+-+Objetiva.pdf, Converta as questões em linhas json, converta em json as questões 5,6,7,8 as propriedades do json são enunciado, alternativas e resposta_correta.";
