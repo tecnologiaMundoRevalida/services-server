@@ -50,7 +50,7 @@ class OpenAIController extends Controller
         ]);
     }
 
-    public function processCsv(Request $request)
+    public function processPdf(Request $request)
     {
         $file = $request->file('file');
         $filePath = $file->getPathname();
@@ -64,10 +64,10 @@ class OpenAIController extends Controller
         // ]);
     }
 
-    public function processPdf(){
-        $response = $this->openAIService->processPdf();
-        return $response;
-    }
+    // public function processPdf(){
+    //     $response = $this->openAIService->processPdf();
+    //     return $response;
+    // }
 
     public function retrieveMessage(Request $request){
         $threadId = $request->input('thread_id');
