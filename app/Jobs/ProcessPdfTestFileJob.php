@@ -41,14 +41,11 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $question_process = $this->retrieveMessage($thread_id,$client);
             $question = $this->saveQuestion($question_process);
         }
-        // return response()->json(['message' => 'Questões processadas com sucesso'], 200);
     }
 
     public function saveQuestion($question_process){
         $question = Question::create([
             'question' => '<p>' . $question_process["questao"] . '</p>',
-            // 'explanation' => '<p>' . $question_process['comentario_da_questao'] . '</p>',
-            // 'discursive_response' => $question_process['discursive_response'],
             'is_discursive' => 0,
             'is_new' => 1,
             // 'is_annulled' => $question_process['is_annulled'],
@@ -68,7 +65,6 @@ class ProcessPdfTestFileJob implements ShouldQueue
     }
 
     public function saveAlternatives($alternatives,$question,$correct){
-        // $question = Question::find($question_id);
         $array_alt_correct = [1 => "A",2 => "B",3 => "C",4 => "D",5 => "E"];
         $i = 1;
         foreach($alternatives as $alternative){

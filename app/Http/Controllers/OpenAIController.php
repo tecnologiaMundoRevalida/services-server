@@ -53,14 +53,15 @@ class OpenAIController extends Controller
     public function processCsv(Request $request)
     {
         $file = $request->file('file');
-        // $filePath = $file->getPathname();
-        $content = utf8_encode(file_get_contents('/Users/eldercarmo/Documents/services-server/public/enare.pdf'));
-        $prompt = "Leia o pdf no endereço: https://mundo-revalida-checklist-images.s3.amazonaws.com/summary_pdf/AMP+2016+-+Objetiva.pdf, Converta as questões em linhas json, converta em json as questões 5,6,7,8 as propriedades do json são enunciado, alternativas e resposta_correta.";
-        $response = $this->openAIService->getResponse($prompt);
+        $filePath = $file->getPathname();
+        dd($filePath);
+        // $content = utf8_encode(file_get_contents('/Users/eldercarmo/Documents/services-server/public/enare.pdf'));
+        // $prompt = "Leia o pdf no endereço: https://mundo-revalida-checklist-images.s3.amazonaws.com/summary_pdf/AMP+2016+-+Objetiva.pdf, Converta as questões em linhas json, converta em json as questões 5,6,7,8 as propriedades do json são enunciado, alternativas e resposta_correta.";
+        // $response = $this->openAIService->getResponse($prompt);
 
-        return response()->json([
-            'response' => $response,
-        ]);
+        // return response()->json([
+        //     'response' => $response,
+        // ]);
     }
 
     public function processPdf(){
