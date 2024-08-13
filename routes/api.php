@@ -48,3 +48,5 @@ Route::post('/processPdfFile', function(Request $request){
 });
 
 Route::post('/processPdf', [OpenAIController::class, 'processPdf'])->middleware(['auth:sanctum']);
+
+Route::post('/processThread', [OpenAIController::class, 'processThread']);

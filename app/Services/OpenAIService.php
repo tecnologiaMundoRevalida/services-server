@@ -47,7 +47,7 @@ class OpenAIService
     }
 
     public function processPdf(){
-        $array_questions = [86,87,88];
+        $array_questions = [47];
         $questions1234 = [];
         foreach($array_questions as $question){
             $thread_id = $this->processThread($question);
@@ -104,7 +104,7 @@ class OpenAIService
         
 
         // The ID of the pre-created assistant
-        $assistantId = 'asst_u2ULDafLGVlbUrUowkh3QGru';
+        $assistantId = 'asst_7i1u4gyAqlWXpuv22ZrKgZ89';
 
         // The path to the PDF file you want to upload
         $filePath = '/Users/eldercarmo/Documents/services-server/public/enare.pdf';
@@ -124,7 +124,7 @@ class OpenAIService
             // );
 
             // The message or instruction you want to send to the assistant
-        $threadMessage = 'converta a questão '.$numero_q.' do arquivo phpMAgT99.pdf em json.';
+        $threadMessage = 'converta a questão '.$numero_q.' do arquivo UFRJ 2020 R1_compressed.pdf em json.';
 
 
             // Create a thread
@@ -143,6 +143,7 @@ class OpenAIService
                             ],
                         ],
             ]);
+            // dd($threadResponse);
 
             $stream = $openai->threads()->runs()->createStreamed(
                 threadId: $threadResponse->id,
@@ -154,10 +155,14 @@ class OpenAIService
             foreach($stream as $response){
                 switch($response->event){
                     case 'thread.run.completed':
-                        return $response->response->threadId;
+                        $response->response->threadId;
                         break;
                 }
             }
+
+            return $this->retrieveMessage($threadResponse->id);
+
+            
             
         } catch (\Exception $e) {
             // Handle errors appropriately (log, return error response, etc.)
