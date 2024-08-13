@@ -39,7 +39,7 @@ class OpenAIController extends Controller
     }
 
     public function processThread(){
-        dd($this->openAIService->processThread(47));
+        dd($this->openAIService->processThread(1));
     }
 
 }
