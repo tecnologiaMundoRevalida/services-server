@@ -17,6 +17,8 @@ return [
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),
         'assistant_model' => env('OPENAI_API_ASSISTANT_MODEL'),
+        'assistant_id' => env('OPENAI_API_ASSISTANT_ID'),
+        'vector_store_id' => env('OPENAI_API_VECTOR_STORE_ID'),
     ],
 
     'mailgun' => [

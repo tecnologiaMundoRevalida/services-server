@@ -3,6 +3,7 @@
 namespace App\Services;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Question;
+use App\Models\Test;
 
 use OpenAI;
 
@@ -10,27 +11,39 @@ class OpenAIService
 {
     protected $client;
     protected $assistantModel;
+    protected $vectorStoreId;
 
     public function __construct()
     {
-        // $this->assistantModel = config('services.openai.assistant_model');
-        $this->assistantModel = 'gpt-4o';
+        $this->assistantModel = config('services.openai.assistant_model');
+        $this->vectorStoreId = config('services.openai.vector_store_id');
         $this->client = OpenAI::client(config('services.openai.api_key'));
     }
 
-    public function newUploadPdf($fileName){
+    public function updateTest($test_id,$status,$amount_questions = null,$amount_questions_processed = null){
+        $test = Test::find($test_id);
+        $test->status = $status;
+        if($amount_questions != null){
+            $test->amount_questions = $amount_questions;
+        }
+        if($amount_questions_processed != null){
+            $test->amount_questions_processed = $amount_questions_processed;
+        }
+        $test->save();
+    }
+
+    public function uploadPdf($fileName){
         $fileUploadResponse = $this->client->files()->upload([
             'purpose' => 'assistants',
             'file' => fopen($fileName, 'r'), 
         ]);
-        $fileId = $fileUploadResponse->id;
-        $response = $this->client->vectorStores()->files()->create(
-            vectorStoreId: 'vs_r3Jym7P2sxlxkHVNk0kiGbTl',
+        $this->client->vectorStores()->files()->create(
+            vectorStoreId: $this->vectorStoreId,
             parameters: [
-                'file_id' => $fileId,
+                'file_id' => $fileUploadResponse->id,
             ]
         );
-        dd($response);
+        return $fileUploadResponse;
     }
 
     public function processPdf(){
@@ -187,45 +200,5 @@ class OpenAIService
         }
     }
 
-    public function getResponse(string $prompt, string $thread = null): string
-    {
-        $response = $this->client->chat()->create([
-            'model' => $this->assistantModel,
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => $prompt,
-                    'thread' => $thread,
-                ],
-            ],
-        ]);
 
-        return $response->choices[0]->message->content;
-    }
-
-    public function uploadFile(string $filePath,string $purpose = 'user_data'): string
-    {
-        $response = $this->client->files()->upload([
-            'file' => fopen($filePath, 'r'),
-            'purpose' => $purpose,
-        ]);
-
-        return $response->id;
-    }
-
-    public function sendMessage(string $message, string $threadId): string
-    {
-        $response = $this->client->chat()->send([
-            'model' => $this->assistantModel,
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => $message,
-                    'thread' => $threadId,
-                ],
-            ],
-        ]);
-
-        return $response->choices[0]->message->content;
-    }
 }

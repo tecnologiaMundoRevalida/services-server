@@ -47,9 +47,4 @@ Route::post('/processPdfFile', function(Request $request){
     dispatch(new App\Jobs\ProcessPdfTestFileJob($filename));
 });
 
-
-Route::post('/openai-response', [OpenAIController::class, 'getResponse']);
-Route::post('/upload-file', [OpenAIController::class, 'uploadFile']);
-Route::post('/send-message', [OpenAIController::class, 'sendMessage']);
-Route::post('/processPdf', [OpenAIController::class, 'processPdf']);
-Route::post('/retrieveMessage', [OpenAIController::class, 'retrieveMessage']);
+Route::post('/processPdf', [OpenAIController::class, 'processPdf'])->middleware(['auth:sanctum']);

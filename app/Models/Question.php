@@ -20,6 +20,7 @@ class Question extends Model
         // 'year_id',
         'active',
         'test_id',
+        'has_image'
     ];
 
     public function institution()
