@@ -98,7 +98,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             if(isset($strem)){
                 $this->awaitThreadCompletion($stream);
             }            
-            TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread created and runned thread_id:'.$threadIdRun]);
+            TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread created and runned thread_id:'.$threadResponse->id]);
             return $threadResponse->id;
             
         } catch (\Exception $e) {
