@@ -12,6 +12,7 @@ use OpenAI;
 use App\Models\Question;
 use App\Services\OpenAIService;
 use App\Models\TestProcessingLog;
+use App\Models\Test;
 
 class ProcessPdfTestFileJob implements ShouldQueue
 {
@@ -23,11 +24,14 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public $test_id;
     public $amount_questions;
     public $assistantId;
+    public $qtd_questions_processed = 0;
     /**
      * Create a new job instance.
      */
     public function __construct($fileName,$test_id,$amount_questions)
     {
+        $test = Test::find($test_id);
+        $this->qtd_questions_processed = isset($test->amount_questions_processed) ? ($test->amount_questions_processed > 0 ? $test->amount_questions_processed + 1 : 1) : 1;
         $this->fileName = $fileName;
         $this->test_id = $test_id;
         $this->amount_questions = $amount_questions;
@@ -50,11 +54,11 @@ class ProcessPdfTestFileJob implements ShouldQueue
 
     public function processPdf($client,$openAiService){
         $openAiService->updateTest($this->test_id,"PROCESSANDO",null);
-        for ($i = 1; $i <= $this->amount_questions; $i++) {
-            $thread_id = $this->processThread($i,$client);
-            $question_process = $this->retrieveMessage($thread_id,$client,$i);
-            $this->saveQuestion($question_process,$i);
-            $openAiService->updateTest($this->test_id,"PROCESSANDO",null,$i);
+        for ($this->qtd_questions_processed; $this->qtd_questions_processed <= $this->amount_questions; $this->qtd_questions_processed++) {
+            $thread_id = $this->processThread($this->qtd_questions_processed,$client);
+            $question_process = $this->retrieveMessage($thread_id,$client,$this->qtd_questions_processed);
+            $this->saveQuestion($question_process,$this->qtd_questions_processed);
+            $openAiService->updateTest($this->test_id,"PROCESSANDO",null,$this->qtd_questions_processed);
         }
         $openAiService->updateTest($this->test_id,"PROCESSADA",null);
     }
