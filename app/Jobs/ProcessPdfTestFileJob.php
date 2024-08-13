@@ -17,6 +17,8 @@ class ProcessPdfTestFileJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $timeout = 2400; 
+
     public $fileName;
     public $test_id;
     public $amount_questions;
