@@ -26,11 +26,8 @@ class OpenAIController extends Controller
             rename($file->getPathname(), $filePath);
             $response = $this->openAIService->uploadPdf($filePath);
             if($response->filename){
-                $parts = [25,50,75,100];
-                foreach($parts as $part){
-                    $this->openAIService->updateTest($request->input('test_id'),'AGUARDANDO',$part);
-                    dispatch(new ProcessPdfTestFileJob($response->filename, $request->input('test_id'), $part))->delay(now()->addMinute(5));
-                }
+                $this->openAIService->updateTest($request->input('test_id'),'AGUARDANDO',$request->input('amount_questions'));
+                dispatch(new ProcessPdfTestFileJob($response->filename, $request->input('test_id'), $request->input('amount_questions')));
             }
         }catch(\Exception $e){
             dd($e->getMessage());
