@@ -22,7 +22,7 @@ class OpenAIController extends Controller
     {
         try{
             $file = $request->file('file');
-            $filePath= $file->getPathname() . '.' . 'pdf';
+            $filePath= $file->getPathname() . '-' . rand() . '.' . 'pdf';
             rename($file->getPathname(), $filePath);
             $response = $this->openAIService->uploadPdf($filePath);
             if($response->filename){
