@@ -18,7 +18,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 2400; 
+    public $timeout = 9999999; 
 
     public $fileName;
     public $test_id;
@@ -63,7 +63,6 @@ class ProcessPdfTestFileJob implements ShouldQueue
                 $openAiService->updateTest($this->test_id,"PROCESSANDO",null,$this->qtd_questions_processed);
             }else{
                 $warning = true;
-                break;
             }
             sleep(10);
         }
