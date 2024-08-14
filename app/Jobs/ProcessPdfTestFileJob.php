@@ -65,7 +65,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
                 $warning = true;
                 break;
             }
-            sleep(60);
+            sleep(10);
         }
         if($warning){
             $openAiService->updateTest($this->test_id,"WARNING",null);
