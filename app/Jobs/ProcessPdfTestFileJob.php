@@ -18,7 +18,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 9999999; 
+    public $timeout = 999999; 
 
     public $fileName;
     public $test_id;
@@ -91,10 +91,10 @@ class ProcessPdfTestFileJob implements ShouldQueue
                         ],
             ]);
             // Run Thread
-            $stream = $this->runThread($client,$threadResponse);
+            $stream = $this->runThread($client,$threadResponse,$numero_q);
             // await the completion of the thread
             
-            $threadIdRun = $this->awaitThreadCompletion($stream);
+            $threadIdRun = $this->awaitThreadCompletion($stream,$numero_q);
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread created and runned thread_id:'.$threadIdRun]);
             return $threadIdRun;
             
@@ -180,23 +180,32 @@ class ProcessPdfTestFileJob implements ShouldQueue
         ]);
     }
 
-    public function runThread($client,$threadResponse){       
-        $stream = $client->threads()->runs()->createStreamed(
-            threadId: $threadResponse->id,
-                parameters: [
-                    'assistant_id' => $this->assistantId,
-                ],
-        );
-        return $stream;
+    public function runThread($client,$threadResponse,$numero_q){   
+        try{
+            $stream = $client->threads()->runs()->createStreamed(
+                threadId: $threadResponse->id,
+                    parameters: [
+                        'assistant_id' => $this->assistantId,
+                    ],
+            );
+            return $stream;
+        }catch(\Exception $e){
+            TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'process error:'.$e->getMessage()]);
+        } 
+        
     }
 
-    public function awaitThreadCompletion($stream){
-        foreach($stream as $response){
-            switch($response->event){
-                case 'thread.run.completed':
-                    return $response->response->threadId;
-                    break;
-            }
+    public function awaitThreadCompletion($stream,$numero_q){
+        try{
+            foreach($stream as $response){
+                switch($response->event){
+                    case 'thread.run.completed':
+                        return $response->response->threadId;
+                        break;
+                }
+            }   
+        }catch(\Exception $e){
+            TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'process error:'.$e->getMessage()]);
         }
     }
 
