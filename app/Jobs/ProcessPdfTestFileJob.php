@@ -51,6 +51,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $client = OpenAI::client(config('services.openai.api_key'));
             $openAiService = new OpenAIService();
             $this->processPdf($client,$openAiService);
+            $this->deleteFile($client);
         }catch(\Exception $e){
             $openAiService->updateTest($this->test_id,"WARNING",null);
         }
