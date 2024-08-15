@@ -27,7 +27,7 @@ class OpenAIController extends Controller
             $response = $this->openAIService->uploadPdf($filePath);
             if($response->filename){
                 $this->openAIService->updateTest($request->input('test_id'),'AGUARDANDO',$request->input('amount_questions'));
-                dispatch(new ProcessPdfTestFileJob($response->filename, $request->input('test_id'), $request->input('amount_questions')));
+                dispatch(new ProcessPdfTestFileJob($response->filename, $request->input('test_id'), $request->input('amount_questions'),$response->id));
             }
         }catch(\Exception $e){
             dd($e->getMessage());

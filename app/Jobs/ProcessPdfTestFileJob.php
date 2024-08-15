@@ -21,6 +21,8 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public $timeout = 999999; 
 
     public $fileName;
+    public $fileId;
+    public $vectorStoreId;
     public $test_id;
     public $amount_questions;
     public $assistantId;
@@ -28,14 +30,16 @@ class ProcessPdfTestFileJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct($fileName,$test_id,$amount_questions)
+    public function __construct($fileName,$test_id,$amount_questions,$fileId)
     {
         $test = Test::find($test_id);
         $this->qtd_questions_processed = isset($test->amount_questions_processed) ? ($test->amount_questions_processed > 0 ? $test->amount_questions_processed + 1 : 1) : 1;
         $this->fileName = $fileName;
+        $this->fileId = $fileId;
         $this->test_id = $test_id;
         $this->amount_questions = $amount_questions;
         $this->assistantId = config('services.openai.assistant_id');
+        $this->vectorStoreId = config('services.openai.vector_store_id');
     }
 
     /**
@@ -192,6 +196,18 @@ class ProcessPdfTestFileJob implements ShouldQueue
         }catch(\Exception $e){
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'process error:'.$e->getMessage()]);
         } 
+        
+    }
+
+    public function deleteFile($client){
+        try{
+            $client->vectorStores()->files()->delete(
+                vectorStoreId: $this->vectorStoreId,
+                fileId: $this->fileId,
+            );        
+        }catch(\Exception $e){
+            TestProcessingLog::create(['test_id' => $this->test_id,'log' => 'error delete file:'.$this->fileId."--".$e->getMessage()]);
+        }
         
     }
 
