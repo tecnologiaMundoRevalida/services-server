@@ -73,7 +73,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             }else{
                 $warning = true;
             }
-            sleep(10);
+            sleep(5);
         }
         if($warning){
             $openAiService->updateTest($this->test_id,"WARNING",null);
@@ -102,12 +102,17 @@ class ProcessPdfTestFileJob implements ShouldQueue
             ]);
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Finish Create Thread:' . json_encode($threadResponse)]);
                 // Run Thread
-                $stream = $this->runThread($client,$threadResponse,$numero_q);
-                // await the completion of the thread
-                
-                $threadIdRun = $this->awaitThreadCompletion($stream,$numero_q);
-                TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread created and runned thread_id:'.$threadIdRun]);
-                return $threadIdRun;
+                if($threadResponse->id != null || $threadResponse->id != ""){
+                    $this->runThread($client,$threadResponse,$numero_q);
+                    // await the completion of the thread
+                    
+                    // $this->awaitThreadCompletion($stream,$numero_q);
+                    TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread created and runned thread_id:'.$threadResponse->id]);
+                    sleep(15);
+                    return $threadResponse->id;
+                }else{
+                    return null;
+                }
         } catch (\Exception $e) {
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'process error:'.$e->getMessage()]);
         }
@@ -193,14 +198,14 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public function runThread($client,$threadResponse,$numero_q){   
         try{
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Start Run Thread']);
-            $stream = $client->threads()->runs()->createStreamed(
+            $client->threads()->runs()->createStreamed(
                 threadId: $threadResponse->id,
                     parameters: [
                         'assistant_id' => $this->assistantId,
                     ],
             );
             // TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Finish Run Thread:' . json_encode($stream)]);
-            return $stream;
+            // return $stream;
         }catch(\Exception $e){
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'process error:'.$e->getMessage()]);
         } 
