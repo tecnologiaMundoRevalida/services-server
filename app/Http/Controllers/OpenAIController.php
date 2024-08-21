@@ -28,12 +28,10 @@ class OpenAIController extends Controller
             if($response->filename){
                 $this->openAIService->updateTest($request->input('test_id'),'AGUARDANDO',$request->input('amount_questions'));
                 dispatch(new ProcessPdfTestFileJob($response->filename, $request->input('test_id'), $request->input('amount_questions'),$response->id));
-                return response()->json([
-                    'message' => "Arquivo enviado com sucesso.",
-                ], 200);
-            }else{
-                throw new \Exception("Erro ao tentar processar o arquivo.");
             }
+            return response()->json([
+                'message' => "Arquivo enviado com sucesso.",
+            ], 200);
         }catch(\Exception $e){
             return response()->json([
                 'message' => "Erro ao tentar processar o arquivo.",
