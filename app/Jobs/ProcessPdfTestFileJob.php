@@ -68,9 +68,11 @@ class ProcessPdfTestFileJob implements ShouldQueue
                     $this->saveQuestion($question_process,$this->qtd_questions_processed);
                     $openAiService->updateTest($this->test_id,"PROCESSANDO",null,$this->qtd_questions_processed);
                 }else{
+                    $this->createQuestionTemporary($this->qtd_questions_processed);
                     $warning = true;
                 }              
             }else{
+                $this->createQuestionTemporary($this->qtd_questions_processed);
                 $warning = true;
             }
             sleep(5);
@@ -108,7 +110,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
                     
                     // $this->awaitThreadCompletion($stream,$numero_q);
                     TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread created and runned thread_id:'.$threadResponse->id]);
-                    sleep(15);
+                    sleep(55);
                     return $threadResponse->id;
                 }else{
                     return null;
@@ -171,6 +173,20 @@ class ProcessPdfTestFileJob implements ShouldQueue
         $this->saveAlternatives($question_process['alternativas'],$question,$question_process["resposta_correta"]);
         $this->saveMedicineAreaReference($question_process['tag'],$question);
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'create question finished','question_id' => $question->id]);
+        return $question;
+    }
+
+    public function createQuestionTemporary($numero_q){
+        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'create question temporary started']);
+        $question = Question::create([
+            'question' => 'Questão temporária: '.$numero_q,
+            'is_discursive' => 0,
+            'is_new' => 1,
+            'active' => 0,
+            'test_id' => $this->test_id,
+            'has_image' => 0,
+        ]);
+        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'create question temporary finished','question_id' => $question->id]);
         return $question;
     }
 
