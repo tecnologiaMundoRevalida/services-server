@@ -199,7 +199,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
                         'assistant_id' => $this->assistantId,
                     ],
             );
-            TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Finish Run Thread:' . json_encode($stream)]);
+            // TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Finish Run Thread:' . json_encode($stream)]);
             return $stream;
         }catch(\Exception $e){
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'process error:'.$e->getMessage()]);
@@ -225,7 +225,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             foreach($stream as $response){
                 switch($response->event){
                     case 'thread.run.completed':
-                        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread Await Completion Completed:' . json_encode($response)]);
+                        // TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Thread Await Completion Completed:' . json_encode($response)]);
                         return $response->response->threadId;
                         break;
                 }
