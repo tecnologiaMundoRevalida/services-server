@@ -36,7 +36,7 @@ class UserTestsRepository
     {
         $user_id = Auth::id();
         return DB::table('questions as q')
-            ->select("q.id")
+            ->select("q.id","qa.id as question_answered")
             ->join("tests as t",function($join){
                 $join->on("t.id","=","q.test_id")
                     ->whereNull("t.status");            
