@@ -24,7 +24,7 @@ class MedtaskActionsController extends Controller
             $this->medtaskActionsService->storeUserTest($request->all());
             return response()->json(['message' => 'Test created successfully'], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error creating test'], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
