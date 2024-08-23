@@ -20,7 +20,12 @@ class MedtaskActionsController extends Controller
 
     public function storeUserTest(UserTestRequest $request)
     {
-        $this->medtaskActionsService->storeUserTest($request->all());
+        try {
+            $this->medtaskActionsService->storeUserTest($request->all());
+            return response()->json(['message' => 'Test created successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error creating test'], 500);
+        }
     }
 
 }
