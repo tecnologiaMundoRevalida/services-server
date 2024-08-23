@@ -3,6 +3,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OpenAIController;
+use App\Http\Controllers\MedtaskActionsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -41,12 +42,15 @@ Route::post('/send-email-updated-user', function(Request $request){
     return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
 
-Route::post('/processPdfFile', function(Request $request){
-    // $body = $request->all();
-    $filename = "phpiqngbh.pdf";
-    dispatch(new App\Jobs\ProcessPdfTestFileJob($filename));
-});
-
 Route::post('/processPdf', [OpenAIController::class, 'processPdf'])->middleware(['auth:sanctum']);
 
-Route::post('/processThread', [OpenAIController::class, 'processThread']);
+Route::group(
+    [
+        'middleware' => 'auth:sanctum',
+        'prefix' => 'medtask-actions'
+    ],
+    function () {
+        Route::post('/storeUserTest', [MedtaskActionsController::class, 'storeUserTest']);
+    }
+);
+

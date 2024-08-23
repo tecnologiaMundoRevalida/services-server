@@ -17,9 +17,7 @@ Route::get('/', function () {
 });
 
 Route::get('/getResumePDF/{checklist_id}/{user_id}', [PDFController::class, 'generatePDF']);
-// Route::get('/myPDF/{checklist_id}/{user_id}', [PDFController::class, 'generatePDF'], function () {
-//     return view('resume');
-// });
+
 Route::get('/', function () {
     return view('welcome');
 });
