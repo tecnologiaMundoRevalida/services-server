@@ -166,7 +166,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             'question' => '<p>' . $question_process["questao"] . '</p>',
             'is_discursive' => 0,
             'is_new' => 1,
-            'active' => 0,
+            'active' => 1,
             'test_id' => $this->test_id,
             'has_image' => $question_process['contem_imagem'] == "S" ? 1 : 0,
         ]);
