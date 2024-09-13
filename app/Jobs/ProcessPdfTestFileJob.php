@@ -51,13 +51,13 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $client = OpenAI::client(config('services.openai.api_key'));
             $openAiService = new OpenAIService();
             $fileUpload = $this->uploadPdf($this->filePath,$client,$this->assistant->vector_store_id);
-            // $this->deleteLocalFile($fileUpload->filename);
             if($fileUpload->filename){
                 $this->fileId = $fileUpload->id;
                 $this->fileName = $fileUpload->filename;
                 $this->assistant->setActive(true);
                 $this->processPdf($client,$openAiService);
                 $this->deleteFile($client);
+                $this->deleteLocalFile($fileUpload->filename);
                 $this->assistant->setActive(false);
             }
         }catch(\Exception $e){
