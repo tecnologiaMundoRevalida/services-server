@@ -51,7 +51,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $client = OpenAI::client(config('services.openai.api_key'));
             $openAiService = new OpenAIService();
             $fileUpload = $openAiService->uploadPdf($this->filePath,$client,$this->assistant->vector_store_id);
-            // $this->deleteLocalFile($fileUpload->filename);
+            $this->deleteLocalFile($fileUpload->filename);
             if($fileUpload->filename){
                 $this->fileId = $fileUpload->id;
                 $this->fileName = $fileUpload->filename;
@@ -273,7 +273,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             // Deleta o arquivo
             Storage::disk('public')->delete('pdfs_provas/' . $fileName);
         } else {
-            // return throw new \Exception('Arquivo não encontrado no caminho especificado: ' . $filePath);
+            return throw new \Exception('Arquivo não encontrado no caminho especificado: ' . $filePath);
         }
     }
 
