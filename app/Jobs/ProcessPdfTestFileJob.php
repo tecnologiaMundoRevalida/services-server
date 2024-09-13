@@ -50,8 +50,8 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $this->qtd_questions_processed = isset($test->amount_questions_processed) ? ($test->amount_questions_processed > 0 ? $test->amount_questions_processed + 1 : 1) : 1;
             $client = OpenAI::client(config('services.openai.api_key'));
             $openAiService = new OpenAIService();
-            $fileUpload = $openAiService->uploadPdf($this->filePath,$client,$this->assistant->vector_store_id);
-            $this->deleteLocalFile($fileUpload->filename);
+            $fileUpload = $this->uploadPdf($this->filePath,$client,$this->assistant->vector_store_id);
+            // $this->deleteLocalFile($fileUpload->filename);
             if($fileUpload->filename){
                 $this->fileId = $fileUpload->id;
                 $this->fileName = $fileUpload->filename;
@@ -275,6 +275,28 @@ class ProcessPdfTestFileJob implements ShouldQueue
         } else {
             return throw new \Exception('Arquivo não encontrado no caminho especificado: ' . $filePath);
         }
+    }
+
+    public function uploadPdf($fileName,$client,$vectorStoreId){
+
+        // Ajusta o caminho correto do arquivo dentro de 'storage/app/public'
+        $filePath = storage_path('app/public/pdfs_provas/' . $fileName);
+
+        // if (!Storage::disk('public')->exists('pdfs_provas/' . $fileName)) {
+        //     throw new \Exception('Arquivo não encontrado no caminho especificado: ' . $filePath);
+        // }
+
+        $fileUploadResponse = $client->files()->upload([
+            'purpose' => 'assistants',
+            'file' => fopen($filePath, 'r'), 
+        ]);
+        $client->vectorStores()->files()->create(
+            vectorStoreId: $vectorStoreId,
+            parameters: [
+                'file_id' => $fileUploadResponse->id,
+            ]
+        );
+        return $fileUploadResponse;
     }
 
 }
