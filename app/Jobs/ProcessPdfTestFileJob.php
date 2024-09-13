@@ -57,7 +57,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
                 $this->assistant->setActive(true);
                 $this->processPdf($client,$openAiService);
                 $this->deleteFile($client);
-                $this->deleteLocalFile($fileUpload->filename);
+                // $this->deleteLocalFile($fileUpload->filename);
                 $this->assistant->setActive(false);
             }
         }catch(\Exception $e){

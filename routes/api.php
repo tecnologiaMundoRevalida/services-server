@@ -42,7 +42,7 @@ Route::post('/send-email-updated-user', function(Request $request){
     return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
 
-Route::post('/processPdfs', [OpenAIController::class, 'processPdf']);
+Route::post('/processPdf', [OpenAIController::class, 'processPdf'])->middleware(['auth:sanctum']);
 
 Route::group(
     [
