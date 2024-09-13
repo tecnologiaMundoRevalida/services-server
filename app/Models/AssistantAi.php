@@ -10,6 +10,7 @@ class AssistantAi extends Model
     use HasFactory;
 
     protected $table = "assistants_ai";
+    public $timestamps = false;
 
     protected $fillable = [
         'assistant_id',
