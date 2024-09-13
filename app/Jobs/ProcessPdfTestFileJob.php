@@ -61,6 +61,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
                 $this->assistant->setActive(false);
             }
         }catch(\Exception $e){
+            TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => 1,'log' => $e->getMessage()]);
             $this->assistant->setActive(false);
             $openAiService->updateTest($this->test_id,"WARNING",null);
         }
