@@ -16,6 +16,7 @@ class Test extends Model
         'amount_questions',
         'status',
         'amount_questions_processed',
+        'file_path',
     ];
 
     public function institution()

@@ -10,7 +10,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use OpenAI;
 use App\Models\Question;
+use Illuminate\Support\Facades\Storage;
 use App\Services\OpenAIService;
+use App\Models\AssistantAi;
 use App\Models\TestProcessingLog;
 use App\Models\Test;
 
@@ -20,26 +22,21 @@ class ProcessPdfTestFileJob implements ShouldQueue
 
     public $timeout = 999999; 
 
+    public $assistant;
     public $fileName;
+    public $filePath;
     public $fileId;
-    public $vectorStoreId;
     public $test_id;
     public $amount_questions;
-    public $assistantId;
     public $qtd_questions_processed = 0;
     /**
      * Create a new job instance.
      */
-    public function __construct($fileName,$test_id,$amount_questions,$fileId)
+    public function __construct($filePath,$test_id,$amount_questions)
     {
-        $test = Test::find($test_id);
-        $this->qtd_questions_processed = isset($test->amount_questions_processed) ? ($test->amount_questions_processed > 0 ? $test->amount_questions_processed + 1 : 1) : 1;
-        $this->fileName = $fileName;
-        $this->fileId = $fileId;
+        $this->filePath = $filePath;
         $this->test_id = $test_id;
         $this->amount_questions = $amount_questions;
-        $this->assistantId = config('services.openai.assistant_id');
-        $this->vectorStoreId = config('services.openai.vector_store_id');
     }
 
     /**
@@ -48,11 +45,23 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public function handle(): void
     {
         try{
+            $test = Test::find($this->test_id);
+            $this->assistant = AssistantAi::getAvailableAssistant();
+            $this->qtd_questions_processed = isset($test->amount_questions_processed) ? ($test->amount_questions_processed > 0 ? $test->amount_questions_processed + 1 : 1) : 1;
             $client = OpenAI::client(config('services.openai.api_key'));
             $openAiService = new OpenAIService();
-            $this->processPdf($client,$openAiService);
-            $this->deleteFile($client);
+            $fileUpload = $openAiService->uploadPdf($this->filePath,$client,$this->assistant->vector_store_id);
+            $this->deleteLocalFile($fileUpload->filename);
+            if($fileUpload->filename){
+                $this->fileId = $fileUpload->id;
+                $this->fileName = $fileUpload->filename;
+                $this->assistant->setActive(true);
+                $this->processPdf($client,$openAiService);
+                $this->deleteFile($client);
+                $this->assistant->setActive(false);
+            }
         }catch(\Exception $e){
+            $this->assistant->setActive(false);
             $openAiService->updateTest($this->test_id,"WARNING",null);
         }
     }
@@ -217,7 +226,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $client->threads()->runs()->createStreamed(
                 threadId: $threadResponse->id,
                     parameters: [
-                        'assistant_id' => $this->assistantId,
+                        'assistant_id' => $this->assistant->assistant_id,
                     ],
             );
             // TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'Finish Run Thread:' . json_encode($stream)]);
@@ -231,7 +240,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public function deleteFile($client){
         try{
             $client->vectorStores()->files()->delete(
-                vectorStoreId: $this->vectorStoreId,
+                vectorStoreId: $this->assistant->vector_store_id,
                 fileId: $this->fileId,
             );        
         }catch(\Exception $e){
@@ -253,6 +262,17 @@ class ProcessPdfTestFileJob implements ShouldQueue
             }   
         }catch(\Exception $e){
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $numero_q,'log' => 'process error:'.$e->getMessage()]);
+        }
+    }
+
+    public function deleteLocalFile($fileName)
+    {
+        // Verifica se o arquivo existe no disco 'public'
+        if (Storage::disk('public')->exists('pdfs_provas/' . $fileName)) {
+            // Deleta o arquivo
+            Storage::disk('public')->delete('pdfs_provas/' . $fileName);
+        } else {
+            return throw new \Exception('Arquivo não encontrado no caminho especificado: ' . $filePath);
         }
     }
 

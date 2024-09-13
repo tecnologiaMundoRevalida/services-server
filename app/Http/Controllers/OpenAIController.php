@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Services\OpenAIService;
 use App\Http\Requests\AI\ProcessPdfRequest;
 use App\Jobs\ProcessPdfTestFileJob;
-use App\Models\Test;
 
 class OpenAIController extends Controller
 {
@@ -21,20 +21,25 @@ class OpenAIController extends Controller
     public function processPdf(ProcessPdfRequest $request)
     {
         try{
-            $file = $request->file('file');
-            $filePath= $file->getPathname() . '-' . rand() . '.' . 'pdf';
-            rename($file->getPathname(), $filePath);
-            $response = $this->openAIService->uploadPdf($filePath);
-            if($response->filename){
-                $this->openAIService->updateTest($request->input('test_id'),'AGUARDANDO',$request->input('amount_questions'));
-                dispatch(new ProcessPdfTestFileJob($response->filename, $request->input('test_id'), $request->input('amount_questions'),$response->id));
+            if ($request->hasFile('file') && $request->file('file')->isValid()) {
+                $file = $request->file('file');
+                $fileName = uniqid() . '-' . time() . '.pdf';
+                $filePath = $file->storeAs('public/pdfs_provas', $fileName);
+                if($filePath){
+                    $this->openAIService->updateTest($request->input('test_id'),'AGUARDANDO',$request->input('amount_questions'),null,$fileName);
+                    dispatch(new ProcessPdfTestFileJob($fileName,$request->input('test_id'), $request->input('amount_questions')));
+                }
+                return response()->json([
+                    'message' => "Arquivo enviado com sucesso.",
+                ], 200);
+            }else{
+                return response()->json([
+                    'message' => "Arquivo inválido.",
+                ], 400);
             }
-            return response()->json([
-                'message' => "Arquivo enviado com sucesso.",
-            ], 200);
         }catch(\Exception $e){
             return response()->json([
-                'message' => "Erro ao tentar processar o arquivo.",
+                'message' => $e->getMessage(),
             ], 500);
         }
         
