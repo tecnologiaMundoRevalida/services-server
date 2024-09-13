@@ -40,9 +40,9 @@ class OpenAIService
         // Ajusta o caminho correto do arquivo dentro de 'storage/app/public'
         $filePath = storage_path('app/public/pdfs_provas/' . $fileName);
 
-        if (!Storage::disk('public')->exists('pdfs_provas/' . $fileName)) {
-            throw new \Exception('Arquivo não encontrado no caminho especificado: ' . $filePath);
-        }
+        // if (!Storage::disk('public')->exists('pdfs_provas/' . $fileName)) {
+        //     throw new \Exception('Arquivo não encontrado no caminho especificado: ' . $filePath);
+        // }
 
         $fileUploadResponse = $client->files()->upload([
             'purpose' => 'assistants',
