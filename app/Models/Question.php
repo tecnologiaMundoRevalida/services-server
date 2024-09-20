@@ -11,6 +11,7 @@ class Question extends Model
 
     protected $fillable = [
         'question',
+        'ord',
         'explanation',
         'discursive_response',
         'is_discursive',
