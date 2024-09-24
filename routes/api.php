@@ -24,7 +24,7 @@ Route::post('/send-email-create-user', function(Request $request){
     $user = User::find($body["id"]);
     $password = $body["password"];
     $type = $body["type"];
-    dispatch(new App\Jobs\SendEmailCreateUserJob($user, $password,$type));
+    dispatch((new App\Jobs\SendEmailCreateUserJob($user, $password,$type))->onQueue('high'));
     return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
 
@@ -38,7 +38,7 @@ Route::post('/send-email-simulated', function(Request $request){
 Route::post('/send-email-updated-user', function(Request $request){
     $body = $request->all();
     $user = User::find($body["id"]);
-    dispatch(new App\Jobs\SendEmailUpdatedUser($user));
+    dispatch((new App\Jobs\SendEmailUpdatedUser($user))->onQueue('high'));
     return response()->json(["message" => "adicionado na fila de envio de e-mails"]);
 });
 

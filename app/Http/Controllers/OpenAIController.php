@@ -27,7 +27,7 @@ class OpenAIController extends Controller
                 $filePath = $file->storeAs('public/pdfs_provas', $fileName);
                 if($filePath){
                     $this->openAIService->updateTest($request->input('test_id'),'AGUARDANDO',$request->input('amount_questions'),null,$fileName);
-                    dispatch(new ProcessPdfTestFileJob($fileName,$request->input('test_id'), $request->input('amount_questions')));
+                    dispatch((new ProcessPdfTestFileJob($fileName,$request->input('test_id'), $request->input('amount_questions')))->onQueue('low'));
                 }
                 return response()->json([
                     'message' => "Arquivo enviado com sucesso.",
