@@ -193,7 +193,8 @@ class ProcessPdfTestFileJob implements ShouldQueue
             'question' => 'Questão temporária: '.$numero_q,
             'is_discursive' => 0,
             'is_new' => 1,
-            'active' => 0,
+            'active' => 1,
+            'ord' => $numero_q,
             'test_id' => $this->test_id,
             'has_image' => 0,
         ]);
