@@ -107,7 +107,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Tags finished','question_id' => $question_id]);
     }catch(\Exception $e){
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Erro edit tags'.$e->getMessage()]);
-        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => json_encode($tag_process)]);
+        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => $tag_process]);
     }
     }
 
