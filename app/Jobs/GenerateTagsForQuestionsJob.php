@@ -96,8 +96,8 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
             if(isset($tag['themes']) && count($tag['themes']) > 0){
                 foreach($tag['themes'] as $theme){
                     if(isset($theme['id']) && $theme['id'] != null){
-                        $theme = ThemeReference::where('question_id',$question_id)->where('theme_id',$theme['id'])->first();
-                        if(!$theme){
+                        $theme_old = ThemeReference::where('question_id',$question_id)->where('theme_id',$theme['id'])->first();
+                        if(!$theme_old){
                             ThemeReference::create(['question_id' => $question_id,'theme_id' => $theme['id']]);
                         }
                     }
@@ -107,7 +107,6 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Tags finished','question_id' => $question_id]);
     }catch(\Exception $e){
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Erro edit tags'.$e->getMessage()]);
-        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => $tag_process]);
     }
     }
 
