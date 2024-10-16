@@ -57,7 +57,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
             if(isset($thread_id) && $thread_id != null && $thread_id != ""){
                 $tag_process = $this->retrieveMessage($thread_id,$client,$key);
                 if($tag_process != "" && $tag_process != null && count($tag_process) > 0){
-                    $this->saveTags($tag_process,$question->id);
+                    $this->saveTags($tag_process,$question->id,$key);
                     $this->updateTest($test,$key);
                 }            
             }
