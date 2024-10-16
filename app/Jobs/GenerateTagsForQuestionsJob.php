@@ -85,10 +85,12 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
             if(!$specialty){
                 SpecialtyReference::create(['question_id' => $question_id,'specialty_id' => $tag['id']]);
             }
-            foreach($tag['themes'] as $theme){
-                $theme = ThemeReference::where('question_id',$question_id)->where('theme_id',$theme['id'])->first();
-                if(!$theme){
-                    ThemeReference::create(['question_id' => $question_id,'theme_id' => $theme['id']]);
+            if(isset($tag['themes']) && count($tag['themes']) > 0){
+                foreach($tag['themes'] as $theme){
+                    $theme = ThemeReference::where('question_id',$question_id)->where('theme_id',$theme['id'])->first();
+                    if(!$theme){
+                        ThemeReference::create(['question_id' => $question_id,'theme_id' => $theme['id']]);
+                    }
                 }
             }
         }
