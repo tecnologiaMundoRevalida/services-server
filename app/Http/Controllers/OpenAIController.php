@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Services\OpenAIService;
 use App\Http\Requests\AI\ProcessPdfRequest;
+use App\Http\Requests\AI\GenerateTagsRequest;
 use App\Jobs\ProcessPdfTestFileJob;
+use App\Jobs\GenerateTagsForQuestionsJob;
 
 class OpenAIController extends Controller
 {
@@ -43,6 +45,14 @@ class OpenAIController extends Controller
             ], 500);
         }
         
+    }
+
+    public function generateTags(GenerateTagsRequest $request)
+    {
+        dispatch((new GenerateTagsForQuestionsJob($request->test_id))->onQueue('low'));
+        return response()->json([
+            'message' => "Geração de Tags Lançada na fila ...",
+        ], 200);
     }
 
 }

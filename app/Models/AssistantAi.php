@@ -41,4 +41,16 @@ class AssistantAi extends Model
     {
         return self::where('active', 0)->firstOrFail();
     }
+
+    /**
+     * Obtém um assistente gerador de Tags.
+     *
+     * @return self
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public static function getAvailableAssistantGenerateTags(): self
+    {
+        return self::find(5);
+    }
 }

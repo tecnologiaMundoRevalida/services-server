@@ -43,6 +43,7 @@ Route::post('/send-email-updated-user', function(Request $request){
 });
 
 Route::post('/processPdf', [OpenAIController::class, 'processPdf'])->middleware(['auth:sanctum']);
+Route::post('/generateTags', [OpenAIController::class, 'generateTags']);
 
 Route::group(
     [

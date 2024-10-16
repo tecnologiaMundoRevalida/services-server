@@ -16,6 +16,7 @@ class Test extends Model
         'amount_questions',
         'status',
         'amount_questions_processed',
+        'amount_tags_processed',
         'file_path',
     ];
 
@@ -32,5 +33,10 @@ class Test extends Model
     public function checklists()
     {
         return $this->hasMany(Checklist::class);
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
     }
 }
