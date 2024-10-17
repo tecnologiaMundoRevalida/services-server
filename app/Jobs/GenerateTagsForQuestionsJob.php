@@ -24,14 +24,14 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
 
     public $timeout = 999999; 
 
-    public $assistant;
-    public $test_id;
+    private $assistant;
     /**
      * Create a new job instance.
      */
-    public function __construct($test_id)
+    public function __construct(private readonly int $test_id,public readonly int $completely)
     {
         $this->test_id = $test_id;
+        $this->completely = $completely;
     }
 
     /**
@@ -74,10 +74,11 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
     public function saveTags($tag_process,$question_id,$key){
         try{
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Tags Start']);
-        MedicineAreaReference::where('question_id',$question_id)->delete();
-        SpecialtyReference::where('question_id',$question_id)->delete();
-        ThemeReference::where('question_id',$question_id)->delete();
-
+        if($this->completely == 1){
+            MedicineAreaReference::where('question_id',$question_id)->delete();
+            SpecialtyReference::where('question_id',$question_id)->delete();
+            ThemeReference::where('question_id',$question_id)->delete();
+        }
         foreach($tag_process as $tag){
             if(isset($tag['medicine_area_id']) && $tag['medicine_area_id'] != null){
                 $medicine_area = MedicineAreaReference::where('question_id',$question_id)->where('medicine_area_id',$tag['medicine_area_id'])->first();

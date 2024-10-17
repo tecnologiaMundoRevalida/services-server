@@ -49,7 +49,7 @@ class OpenAIController extends Controller
 
     public function generateTags(GenerateTagsRequest $request)
     {
-        dispatch((new GenerateTagsForQuestionsJob($request->test_id))->onQueue('low'));
+        dispatch((new GenerateTagsForQuestionsJob($request->test_id,$request->completely))->onQueue('low'));
         return response()->json([
             'message' => "Geração de Tags Lançada na fila ...",
         ], 200);

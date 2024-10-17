@@ -26,7 +26,8 @@ class GenerateTagsRequest extends FormRequest
     public function rules()
     {
         return [
-            'test_id' => ['required', 'integer', 'exists:tests,id']
+            'test_id' => ['required', 'integer', 'exists:tests,id'],
+            'completely' => ['required', 'integer', 'in:0,1'],
         ];
     }
 
