@@ -29,10 +29,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(private readonly int $test_id,public readonly int $completely)
-    {
-        $this->test_id = $test_id;
-        $this->completely = $completely;
-    }
+    {}
 
     /**
      * Execute the job.
