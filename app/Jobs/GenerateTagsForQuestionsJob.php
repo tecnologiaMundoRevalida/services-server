@@ -142,7 +142,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
                 // Run Thread
                 if($threadResponse->id != null || $threadResponse->id != ""){
                     $this->runThread($client,$threadResponse,$key);
-                    sleep(55);
+                    sleep(85);
                     return $threadResponse->id;
                 }else{
                     return null;
@@ -154,7 +154,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
 
     public function getQuestionAndAlternativesText($question){
         $alternativesText = "";
-        $ord = ["0" => "A","1" => "B","2" => "C","3" => "D","4" => "E"];
+        $ord = ["0" => "A","1" => "B","2" => "C","3" => "D","4" => "E","5" => "F","6" => "G","7" => "H","8" => "I","9" => "J"];
         foreach($question->alternatives as $key => $alternative){
             $letter = $ord[$key];
             $alternativesText = $alternativesText . $letter .")" . $alternative->alternative . " ";
