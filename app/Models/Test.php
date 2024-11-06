@@ -15,9 +15,11 @@ class Test extends Model
         'type',
         'amount_questions',
         'status',
+        'released_to_comment',
         'amount_questions_processed',
         'amount_tags_processed',
         'file_path',
+        'tag_generation_status'
     ];
 
     public function institution()

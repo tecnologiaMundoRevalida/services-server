@@ -40,7 +40,9 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
             $test = Test::with(['questions','questions.alternatives'])->find($this->test_id);
             $this->assistant = AssistantAi::getAvailableAssistantGenerateTags();
             $client = OpenAI::client(config('services.openai.api_key'));
+            $this->updateTest($test,null,"GENERATING");
             $this->generateTags($client,$test);
+            $this->updateTest($test,null,"GENERATED");
             
         }catch(\Exception $e){
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => 0,'log' => $e->getMessage()]);
@@ -63,8 +65,20 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
         
     }
 
-    public function updateTest($test,$key){
-        $test->amount_tags_processed = $key + 1;
+    public function updateQuestion($question_id){
+        $question = Question::find($question_id);
+        $question->ai_generated_tag = 1;
+        $question->save();
+    }
+
+    public function updateTest($test,$key,$tag_generation_status = null){
+        if($tag_generation_status != null){
+            $test->tag_generation_status = $tag_generation_status;
+        }
+        if($key != null){
+            $test->amount_tags_processed = $key + 1;
+        }
+        
         $test->save();
     }
 
@@ -102,6 +116,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
                 }
             }
         }
+        $this->updateQuestion($question_id);
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Tags finished','question_id' => $question_id]);
     }catch(\Exception $e){
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Erro edit tags'.$e->getMessage()]);

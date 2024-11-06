@@ -21,7 +21,12 @@ class Question extends Model
         // 'year_id',
         'active',
         'test_id',
-        'has_image'
+        'has_image',
+        'commented_by',
+        'is_revised',
+        'revised_by',
+        'revised_at',
+        'ai_generated_tag'
     ];
 
     public function institution()
