@@ -84,43 +84,54 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
 
     public function saveTags($tag_process,$question_id,$key){
         try{
-        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Tags Start']);
+        TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Tags Start']);     
         if($this->completely == 1){
             MedicineAreaReference::where('question_id',$question_id)->delete();
             SpecialtyReference::where('question_id',$question_id)->delete();
             ThemeReference::where('question_id',$question_id)->delete();
         }
-        foreach($tag_process as $tag){
-            if(isset($tag['medicine_area_id']) && $tag['medicine_area_id'] != null){
-                $medicine_area = MedicineAreaReference::where('question_id',$question_id)->where('medicine_area_id',$tag['medicine_area_id'])->first();
-                if(!$medicine_area){
-                    MedicineAreaReference::create(['question_id' => $question_id,'medicine_area_id' => $tag['medicine_area_id']]);
+        $check = $this->checkCurrentTags($question_id);
+        if(!$check){
+            foreach($tag_process as $tag){
+                if(isset($tag['medicine_area_id']) && $tag['medicine_area_id'] != null){
+                    $medicine_area = MedicineAreaReference::where('question_id',$question_id)->where('medicine_area_id',$tag['medicine_area_id'])->first();
+                    if(!$medicine_area){
+                        MedicineAreaReference::create(['question_id' => $question_id,'medicine_area_id' => $tag['medicine_area_id']]);
+                    }
                 }
-            }
-
-            if(isset($tag['id']) && $tag['id'] != null){
-                $specialty = SpecialtyReference::where('question_id',$question_id)->where('specialty_id',$tag['id'])->first();
-                if(!$specialty){
-                    SpecialtyReference::create(['question_id' => $question_id,'specialty_id' => $tag['id']]);
+    
+                if(isset($tag['id']) && $tag['id'] != null){
+                    $specialty = SpecialtyReference::where('question_id',$question_id)->where('specialty_id',$tag['id'])->first();
+                    if(!$specialty){
+                        SpecialtyReference::create(['question_id' => $question_id,'specialty_id' => $tag['id']]);
+                    }
                 }
-            }
-
-            if(isset($tag['themes']) && count($tag['themes']) > 0){
-                foreach($tag['themes'] as $theme){
-                    if(isset($theme['id']) && $theme['id'] != null){
-                        $theme_old = ThemeReference::where('question_id',$question_id)->where('theme_id',$theme['id'])->first();
-                        if(!$theme_old){
-                            ThemeReference::create(['question_id' => $question_id,'theme_id' => $theme['id']]);
+    
+                if(isset($tag['themes']) && count($tag['themes']) > 0){
+                    foreach($tag['themes'] as $theme){
+                        if(isset($theme['id']) && $theme['id'] != null){
+                            $theme_old = ThemeReference::where('question_id',$question_id)->where('theme_id',$theme['id'])->first();
+                            if(!$theme_old){
+                                ThemeReference::create(['question_id' => $question_id,'theme_id' => $theme['id']]);
+                            }
                         }
                     }
                 }
             }
+            $this->updateQuestion($question_id);
         }
-        $this->updateQuestion($question_id);
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Tags finished','question_id' => $question_id]);
     }catch(\Exception $e){
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Erro edit tags'.$e->getMessage()]);
     }
+    }
+
+    public function checkCurrentTags($question_id):bool
+    {
+        $medicine_area = MedicineAreaReference::where('question_id',$question_id)->first();
+        $specialty = SpecialtyReference::where('question_id',$question_id)->first();
+
+        return $medicine_area && $specialty;
     }
 
     public function processThread($question,$client,$key)
