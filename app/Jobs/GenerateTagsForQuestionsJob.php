@@ -153,7 +153,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
                 // Run Thread
                 if($threadResponse->id != null || $threadResponse->id != ""){
                     $this->runThread($client,$threadResponse,$key);
-                    sleep(55);
+                    sleep(85);
                     return $threadResponse->id;
                 }else{
                     return null;
