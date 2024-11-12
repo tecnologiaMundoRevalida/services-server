@@ -26,7 +26,9 @@ class Question extends Model
         'is_revised',
         'revised_by',
         'revised_at',
-        'ai_generated_tag'
+        'ai_generated_tag',
+        'tag_revised',
+        'tag_revised_by'
     ];
 
     public function institution()
