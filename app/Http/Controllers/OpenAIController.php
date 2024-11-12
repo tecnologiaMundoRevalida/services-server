@@ -49,6 +49,7 @@ class OpenAIController extends Controller
 
     public function generateTags(GenerateTagsRequest $request)
     {
+        $this->openAIService->updateTest($request->test_id,null,null,null,null,"WAITING");
         dispatch((new GenerateTagsForQuestionsJob($request->test_id,$request->completely))->onQueue('low'));
         return response()->json([
             'message' => "Geração de Tags Lançada na fila ...",

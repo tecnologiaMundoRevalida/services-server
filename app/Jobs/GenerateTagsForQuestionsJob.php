@@ -57,9 +57,9 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
                 $tag_process = $this->retrieveMessage($thread_id,$client,$key);
                 if($tag_process != "" && $tag_process != null && count($tag_process) > 0){
                     $this->saveTags($tag_process,$question->id,$key);
-                    $this->updateTest($test,$key);
                 }            
             }
+            $this->updateTest($test,$key);
             sleep(5);
         }
         
@@ -153,7 +153,7 @@ class GenerateTagsForQuestionsJob implements ShouldQueue
                 // Run Thread
                 if($threadResponse->id != null || $threadResponse->id != ""){
                     $this->runThread($client,$threadResponse,$key);
-                    sleep(85);
+                    sleep(55);
                     return $threadResponse->id;
                 }else{
                     return null;
