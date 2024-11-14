@@ -9,6 +9,7 @@ use App\Http\Requests\AI\ProcessPdfRequest;
 use App\Http\Requests\AI\GenerateTagsRequest;
 use App\Jobs\ProcessPdfTestFileJob;
 use App\Jobs\GenerateTagsForQuestionsJob;
+use App\Jobs\GenerateCommentsForQuestionsJob;
 
 class OpenAIController extends Controller
 {
@@ -54,6 +55,20 @@ class OpenAIController extends Controller
         return response()->json([
             'message' => "Geração de Tags Lançada na fila ...",
         ], 200);
+    }
+
+    public function generateComments(Request $request)
+    {
+        // $this->openAIService->updateTest($request->test_id,null,null,null,null,"WAITING");
+        // dispatch((new GenerateCommentsForQuestionsJob($request->test_id))->onQueue('low'));
+        // return response()->json([
+        //     'message' => "Geração de Comentários Lançada na fila ...",
+        // ], 200);
+        $comments = new GenerateCommentsForQuestionsJob($request->test_id,1);
+        return response()->json([
+            'message' => $comments->handle(),
+        ], 200);
+
     }
 
 }

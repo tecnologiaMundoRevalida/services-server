@@ -19,7 +19,9 @@ class Test extends Model
         'amount_questions_processed',
         'amount_tags_processed',
         'file_path',
-        'tag_generation_status'
+        'tag_generation_status',
+        'amount_comments_processed',
+        'comment_generation_status'
     ];
 
     public function institution()

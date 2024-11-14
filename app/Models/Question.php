@@ -28,7 +28,10 @@ class Question extends Model
         'revised_at',
         'ai_generated_tag',
         'tag_revised',
-        'tag_revised_by'
+        'tag_revised_by',
+        'ai_generated_comment',
+        'comment_revised',
+        'comment_revised_by',
     ];
 
     public function institution()
