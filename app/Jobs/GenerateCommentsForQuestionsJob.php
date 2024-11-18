@@ -368,7 +368,6 @@ class GenerateCommentsForQuestionsJob implements ShouldQueue
             }
         }
         $question->save();
-        dd($question);
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Edit Comment finished','question_id' => $question_id]);
     }catch(\Exception $e){
         TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Erro edit Comment'.$e->getMessage()]);
