@@ -20,7 +20,7 @@ class OpenAIService
         // $this->client = OpenAI::client(config('services.openai.api_key'));
     }
 
-    public function updateTest($test_id,$status = null,$amount_questions = null,$amount_questions_processed = null,$file_path = null,$tag_generation_status = null){
+    public function updateTest($test_id,$status = null,$amount_questions = null,$amount_questions_processed = null,$file_path = null,$tag_generation_status = null,$comment_generation_status = null){
         $test = Test::find($test_id);
 
         if($status != null){
@@ -39,6 +39,10 @@ class OpenAIService
 
         if($tag_generation_status != null){
             $test->tag_generation_status = $tag_generation_status;
+        }
+
+        if($comment_generation_status != null){
+            $test->comment_generation_status = $comment_generation_status;
         }
         
         $test->save();

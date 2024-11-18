@@ -260,9 +260,9 @@ const DEFAULT_PROMPT = "Você é um médico subespecialista renomado em pediatri
 
     Segue a pergunta que você deve comentar seguindo o padrão apresentado, explicando a questão, a doença abordada, como diagnosticar, abordando fisiopatologia, medicações, exame físico e ao final comentando cada uma das alternativas. É importante manter um tom amigável e descontraído com o aluno e escrever de forma que prenda o interesse do leitor. Faça uma exploração dos temas para que os alunos compreendam melhor e aprendam com aquela questão, não saiam com dúvidas. Seja conciso nas informações. Como são alunos de Medicina, é importante sempre citar os protocolos de onde tirou as informações, para que eles possam buscar as informações e confirmar elas também.";
 
-class GenerateCommentsForQuestionsJob 
+class GenerateCommentsForQuestionsJob implements ShouldQueue
 {
-    // use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 999999; 
 
@@ -281,9 +281,9 @@ class GenerateCommentsForQuestionsJob
         try{
             $test = Test::with(['questions','questions.alternatives'])->find($this->test_id);
             $client = OpenAI::client(config('services.openai.api_key'));
-            // $this->updateTest($test,null,"GENERATING");
+            $this->updateTest($test,null,"GENERATING");
             $this->generateComments($client,$test);
-            // $this->updateTest($test,null,"GENERATED");
+            $this->updateTest($test,null,"GENERATED");
             
         }catch(\Exception $e){
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => 0,'log' => $e->getMessage()]);
@@ -297,17 +297,11 @@ class GenerateCommentsForQuestionsJob
             if(isset($comment_generated) && $comment_generated != null && $comment_generated != "" && $comment_generated != " " && $comment_generated > 10){
                     $this->saveComment($comment_generated,$question->id,$key);          
             }
-            dd('aki 123 seguro');
-            // $this->updateTest($test,$key);
-            sleep(5);
+            $this->updateTest($test,$key);
+            sleep(20);
         }
     }
 
-    // public function updateQuestion($question_id){
-    //     $question = Question::find($question_id);
-    //     $question->ai_generated_comment = 1;
-    //     $question->save();
-    // }
 
     public function updateTest($test,$key,$comment_generation_status = null){
         if($comment_generation_status != null){
@@ -333,7 +327,7 @@ class GenerateCommentsForQuestionsJob
                 'messages' => [
                     ['role' => 'user', 'content' => $comment_prompt]
                 ],
-                'max_tokens' => 1500,
+                'max_tokens' => 1800,
                 'n' => 1,
                 'temperature' => 1
             ]);
@@ -366,11 +360,11 @@ class GenerateCommentsForQuestionsJob
         $question = Question::find($question_id);
         if($this->completely == 1){
             $question->explanation = $comment_generated;
-            // $question->ai_generated_comment = 1;
+            $question->ai_generated_comment = 1;
         }else{
             if($question->explanation == null || $question->explanation == "" || $question->explanation == " " || $question->explanation < 10){
                 $question->explanation = $comment_generated;
-                // $question->ai_generated_comment = 1;
+                $question->ai_generated_comment = 1;
             }
         }
         $question->save();

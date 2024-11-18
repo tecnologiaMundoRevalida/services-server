@@ -59,14 +59,11 @@ class OpenAIController extends Controller
 
     public function generateComments(Request $request)
     {
-        // $this->openAIService->updateTest($request->test_id,null,null,null,null,"WAITING");
-        // dispatch((new GenerateCommentsForQuestionsJob($request->test_id))->onQueue('low'));
-        // return response()->json([
-        //     'message' => "Geração de Comentários Lançada na fila ...",
-        // ], 200);
-        $comments = new GenerateCommentsForQuestionsJob($request->test_id,1);
+
+        $this->openAIService->updateTest($request->test_id,null,null,null,null,null,"WAITING");
+        dispatch((new GenerateCommentsForQuestionsJob($request->test_id,$request->completely))->onQueue('low'));
         return response()->json([
-            'message' => $comments->handle(),
+            'message' => "Geração de Comentários Lançada na fila ...",
         ], 200);
 
     }
