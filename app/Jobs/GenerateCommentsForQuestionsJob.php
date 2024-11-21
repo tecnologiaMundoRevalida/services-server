@@ -323,7 +323,8 @@ class GenerateCommentsForQuestionsJob implements ShouldQueue
             // Create a thread
             TestProcessingLog::create(['test_id' => $this->test_id,'number_question' => $key,'log' => 'Start Create chat to Generate Comment']);
             $threadResponse = $client->chat()->create([
-                'model' => 'gpt-4o',
+                'model' => 'o1-preview',
+                // gpt-4o
                 'messages' => [
                     ['role' => 'user', 'content' => $comment_prompt]
                 ],
