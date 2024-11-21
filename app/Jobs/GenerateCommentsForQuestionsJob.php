@@ -298,7 +298,7 @@ class GenerateCommentsForQuestionsJob implements ShouldQueue
                     $this->saveComment($comment_generated,$question->id,$key);          
             }
             $this->updateTest($test,$key);
-            sleep(20);
+            sleep(60);
         }
     }
 
