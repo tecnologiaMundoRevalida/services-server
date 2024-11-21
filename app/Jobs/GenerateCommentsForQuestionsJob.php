@@ -328,7 +328,7 @@ class GenerateCommentsForQuestionsJob implements ShouldQueue
                 'messages' => [
                     ['role' => 'user', 'content' => $comment_prompt]
                 ],
-                'max_tokens' => 1800,
+                'max_completion_tokens' => 1800,
                 'n' => 1,
                 'temperature' => 1
             ]);
