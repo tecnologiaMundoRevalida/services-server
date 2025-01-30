@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule):void
     {
         $schedule->command('reservations:deactivate')
-                ->dailyAt('13:10');
+                ->dailyAt('03:00');
     }
 
     /**
