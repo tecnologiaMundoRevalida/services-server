@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\PDFTestController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,5 +22,7 @@ Route::get('/getResumePDF/{checklist_id}/{user_id}', [PDFController::class, 'gen
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/process-pdf-test/{userTestId}', [PDFTestController::class, 'processPdfTest']);
 
 
