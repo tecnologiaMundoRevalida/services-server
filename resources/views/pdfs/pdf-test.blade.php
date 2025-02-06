@@ -81,21 +81,23 @@
         }
 
         .number-question {
+            display:inline-block;
             border: 1px solid black;
             border-right: none;
             padding: 5px;
             margin-right: 0;
-            margin-bottom: 8px;
+            margin-top: 20px;
         }
 
         .answer {
+            display:inline-block;
             border: 1px solid black;
             border-left: none;
             margin-left: 0;
             margin-right: 10px;
             padding: 5px;
             background-color: #9ca3af;
-            margin-bottom: 8px;
+            margin-top: 20px;
         }
 
     </style>
@@ -138,7 +140,6 @@
     @endforeach
 
     <h3>GABARITO</h3>
-
     @foreach($answerKey as $answer)
         <span class="number-question">{{ $answer['question'] }}</span>
         <span class="answer">{{ $answer['correct_alternative'] ?? '' }}</span>
