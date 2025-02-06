@@ -67,7 +67,7 @@ class PDFTestService
         if ($this->deleteQuestion === FilterDeleteQuestionPDFTest::CERTAS->value) {
             $sql .= " AND utr.question_id NOT in (SELECT qa.question_id FROM user_test_questions utq, questions_answered qa
                       WHERE utq.question_answered_id = qa.id
-					  AND utq.user_test_id = 2 AND qa.is_correct = 1)";
+					  AND utq.user_test_id = $userTestId AND qa.is_correct = 1)";
         }
 
         return DB::select($sql);
