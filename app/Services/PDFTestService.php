@@ -111,7 +111,7 @@ class PDFTestService
 
                 $data[$id['id']] = Alternative::query()
                     ->select(['id', 'alternative', 'discursive_response', 'is_correct', 'question_id'])
-                    ->where('question_id', $id['id'])->where('active', '=', 1)
+                    ->where('question_id', $id['id'])
                     ->get();
 
                 foreach ($data[$id['id']] as $key => $alternative) {
