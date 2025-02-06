@@ -14,7 +14,7 @@
             /*background-position: bottom right;*/
             background-position: center;
             background-repeat: no-repeat;
-            background-size: 40%;
+            background-size: 100%;
         }
 
         .alternative {
@@ -70,6 +70,32 @@
             font-size: {{ $fontSize['alternative'] }};
         }
 
+        .annulled {
+            width: fit-content;
+            font-size: {{ $fontSize['annulled_question'] }};
+            color: #fff;
+            margin-bottom: 1rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 50px;
+            background: red !important;
+        }
+
+        .number-question {
+            border: 1px solid black;
+            border-right: none;
+            padding: 5px;
+            margin-right: 0;
+        }
+
+        .answer {
+            border: 1px solid black;
+            border-left: none;
+            margin-left: 0;
+            margin-right: 10px;
+            padding: 5px;
+            background-color: #9ca3af;
+        }
+
     </style>
 </head>
 <body>
@@ -90,6 +116,9 @@
             <div>
                 <h2 class="title-question">Questão {{ $questionNumber }}  {!! $question->medicine_area ?? '' !!}</h2>
                 <h4 class="subtitle-question">{{ $question->name_institution }} - {{ $question->name_year }}</h4>
+                @if($question->is_annulled)
+                    <span class="annulled">QUESTÃO ANULADA</span>
+                @endif
             </div>
 
             <div class="question-description">
@@ -104,6 +133,13 @@
             @endforeach
             <hr>
         </div>
+    @endforeach
+
+    <h3>GABARITO</h3>
+
+    @foreach($answerKey as $answer)
+        <span class="number-question">{{ $answer['question'] }}</span>
+        <span class="answer">{{ $answer['correct_alternative'] }}</span>
     @endforeach
 </body>
 </html>

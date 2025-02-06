@@ -13,6 +13,7 @@ class PDFTestService
     private array $questionsId;
     private bool $flagTags = false;
     private string $deleteQuestion = 'n';
+    private array $answerKey = [];
 
     public function processPdfTest(int $userTestId): mixed
     {
@@ -42,7 +43,8 @@ class PDFTestService
         $pdf = Pdf::loadView('pdfs.pdf-test', [
             'data' => $questions,
             'fontSize' => $fontSize,
-            'logoBackground' => $this->getLogoBackgroundPDFBase64()
+            'logoBackground' => $this->getLogoBackgroundPDFBase64(),
+            'answerKey' => $this->answerKey
         ]);
 
         return $pdf->stream('questoes.pdf');
@@ -56,11 +58,16 @@ class PDFTestService
                 WHERE utr.user_test_id = $userTestId";
 
         if ($this->deleteQuestion === FilterDeleteQuestionPDFTest::RESOLVIDAS->value) {
-            $sql .= " AND utr.question_id NOT in (SELECT qa.question_id FROM questions_answered qa)";
+            $sql .= " AND utr.question_id NOT in
+                      (SELECT qa.question_id FROM user_test_questions utq, questions_answered qa
+                      WHERE utq.question_answered_id = qa.id
+					  AND utq.user_test_id = $userTestId )";
         }
 
         if ($this->deleteQuestion === FilterDeleteQuestionPDFTest::CERTAS->value) {
-            $sql .= " AND utr.question_id NOT in (SELECT qa.question_id FROM questions_answered qa where qa.is_correct = 1)";
+            $sql .= " AND utr.question_id NOT in (SELECT qa.question_id FROM user_test_questions utq, questions_answered qa
+                      WHERE utq.question_answered_id = qa.id
+					  AND utq.user_test_id = 2 AND qa.is_correct = 1)";
         }
 
         return DB::select($sql);
@@ -78,7 +85,7 @@ class PDFTestService
                 ->join('institutions', 'tests.institution_id', '=', 'institutions.id')
                 ->join('years', 'tests.year_id', '=', 'years.id')
                 ->where('questions.id', '=', $question->question_id)
-                ->select('questions.id', 'questions.ord', 'questions.question', 'questions.explanation', 'questions.discursive_response', 'questions.image', 'questions.comment_image', 'institutions.name as name_institution', 'years.name as name_year')
+                ->select('questions.id', 'questions.ord', 'questions.question', 'questions.explanation', 'questions.discursive_response', 'questions.is_annulled', 'questions.image', 'questions.comment_image', 'institutions.name as name_institution', 'years.name as name_year')
                 ->get()[0];
 
             if ($this->flagTags) {
@@ -95,17 +102,29 @@ class PDFTestService
     {
         $data = [];
 
-        foreach ($this->questionsId as $id) {
-            $data[$id] = Alternative::query()
-                ->select(['id', 'alternative', 'discursive_response', 'is_correct', 'question_id'])
-                ->where('question_id', $id)->where('active', '=', 1)
-                ->get();
+        if (count($this->questionsId) > 0) {
+            foreach ($this->questionsId as $questionNumber => $id) {
+                $questionNumber++;
+                $this->answerKey[$id]['question'] = $questionNumber;
+
+                $data[$id] = Alternative::query()
+                    ->select(['id', 'alternative', 'discursive_response', 'is_correct', 'question_id'])
+                    ->where('question_id', $id)->where('active', '=', 1)
+                    ->get();
 
                 foreach ($data[$id] as $key => $alternative) {
                     $data[$id][$key]['alternative'] =  strip_tags($alternative['alternative']);
                     $data[$id][$key]['option'] =  $this->parseKeyToABC($key);
-                }
 
+                    if ($alternative['is_correct']) {
+                        $this->answerKey[$id]['correct_alternative'] = $this->parseKeyToABC($key);
+                    }
+
+                    if ($alternative['discursive_response']) {
+                        $this->answerKey[$id]['correct_alternative'] = 'discursiva';
+                    }
+                }
+            }
         }
 
         return $data;
@@ -153,6 +172,7 @@ class PDFTestService
                 'title_question'       => '20px',
                 'medicine_area'        => '10px',
                 'subtitle_question'    => '12px',
+                'annulled_question'    => '10px',
                 'question_description' => '12px',
                 'alternative'          => '12px'
             ],
@@ -160,6 +180,7 @@ class PDFTestService
                 'title_question'       => '24px',
                 'medicine_area'        => '12px',
                 'subtitle_question'    => '16px',
+                'annulled_question'    => '12px',
                 'question_description' => '16px',
                 'alternative'          => '16px'
             ],
@@ -167,6 +188,7 @@ class PDFTestService
                 'title_question'       => '28px',
                 'medicine_area'        => '14px',
                 'subtitle_question'    => '20px',
+                'annulled_question'    => '14px',
                 'question_description' => '20px',
                 'alternative'          => '20px'
             ]
@@ -177,7 +199,7 @@ class PDFTestService
 
     private function getLogoBackgroundPDFBase64(): string
     {
-        $filepathLogo = public_path('images/LOGOTIPO_MEDTASK_RGB-33_opacity.jpg');
+        $filepathLogo = public_path('images/logo_background_medtask.jpg');
         $filetype = pathinfo($filepathLogo, PATHINFO_EXTENSION);
         $getLogo = file_get_contents($filepathLogo);
         return 'data:image/' . $filetype . ';base64,' . base64_encode($getLogo);
