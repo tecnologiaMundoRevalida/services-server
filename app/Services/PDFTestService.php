@@ -33,7 +33,7 @@ class PDFTestService
         $alternatives = $this->getAlternativesQuestion();
 
         foreach ($this->questionsId as $id) {
-            $questions[$id]->alternatives = $alternatives[$id];
+            $questions[$id['id']]->alternatives = $alternatives[$id['id']];
         }
 
         $fontSize = $this->getFontSizePDF(
@@ -78,7 +78,7 @@ class PDFTestService
         $data = [];
 
         foreach ($questionsId as $key => $question) {
-            $this->questionsId[] = $question->question_id;
+            $this->questionsId[$key]['id'] = $question->question_id;
 
             $data[$question->question_id] = DB::table('questions')
                 ->join('tests', 'questions.test_id', '=', 'tests.id')
@@ -87,6 +87,8 @@ class PDFTestService
                 ->where('questions.id', '=', $question->question_id)
                 ->select('questions.id', 'questions.ord', 'questions.question', 'questions.explanation', 'questions.discursive_response', 'questions.is_annulled', 'questions.image', 'questions.comment_image', 'institutions.name as name_institution', 'years.name as name_year')
                 ->get()[0];
+
+            $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled;
 
             if ($this->flagTags) {
                 $data[$question->question_id]->medicine_area = $this->parseArrayToStringPDF(
@@ -105,24 +107,30 @@ class PDFTestService
         if (count($this->questionsId) > 0) {
             foreach ($this->questionsId as $questionNumber => $id) {
                 $questionNumber++;
-                $this->answerKey[$id]['question'] = $questionNumber;
+                $this->answerKey[$id['id']]['question'] = $questionNumber;
 
-                $data[$id] = Alternative::query()
+                $data[$id['id']] = Alternative::query()
                     ->select(['id', 'alternative', 'discursive_response', 'is_correct', 'question_id'])
-                    ->where('question_id', $id)->where('active', '=', 1)
+                    ->where('question_id', $id['id'])->where('active', '=', 1)
                     ->get();
 
-                foreach ($data[$id] as $key => $alternative) {
-                    $data[$id][$key]['alternative'] =  strip_tags($alternative['alternative']);
-                    $data[$id][$key]['option'] =  $this->parseKeyToABC($key);
+                foreach ($data[$id['id']] as $key => $alternative) {
+                    $data[$id['id']][$key]['alternative'] =  strip_tags($alternative['alternative']);
+                    $data[$id['id']][$key]['option'] =  $this->parseKeyToABC($key);
 
-                    if ($alternative['is_correct']) {
-                        $this->answerKey[$id]['correct_alternative'] = $this->parseKeyToABC($key);
+                    if ($id['is_annulled'] != 1) {
+                        if ($alternative['is_correct']) {
+                            $this->answerKey[$id['id']]['correct_alternative'] = $this->parseKeyToABC($key);
+                        }
+
+                        if ($alternative['discursive_response']) {
+                            $this->answerKey[$id['id']]['correct_alternative'] = 'discursiva';
+                        }
+                    } else {
+                        $this->answerKey[$id['id']]['correct_alternative'] = 'anulada';
                     }
 
-                    if ($alternative['discursive_response']) {
-                        $this->answerKey[$id]['correct_alternative'] = 'discursiva';
-                    }
+
                 }
             }
         }
