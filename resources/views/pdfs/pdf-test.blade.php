@@ -139,7 +139,7 @@
 
     @foreach($answerKey as $answer)
         <span class="number-question">{{ $answer['question'] }}</span>
-        <span class="answer">{{ $answer['correct_alternative'] }}</span>
+        <span class="answer">{{ $answer['correct_alternative'] ?? '' }}</span>
     @endforeach
 </body>
 </html>
