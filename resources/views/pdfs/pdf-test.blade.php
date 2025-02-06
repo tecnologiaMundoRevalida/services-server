@@ -85,6 +85,7 @@
             border-right: none;
             padding: 5px;
             margin-right: 0;
+            margin-bottom: 8px;
         }
 
         .answer {
@@ -94,6 +95,7 @@
             margin-right: 10px;
             padding: 5px;
             background-color: #9ca3af;
+            margin-bottom: 8px;
         }
 
     </style>
