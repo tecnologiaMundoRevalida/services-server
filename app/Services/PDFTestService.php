@@ -7,6 +7,7 @@ use App\Models\MedicineAreaReference;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Enums\FilterDeleteQuestionPDFTest;
+use Illuminate\View\View;
 
 class PDFTestService
 {
@@ -40,12 +41,24 @@ class PDFTestService
             request()->get('font_size') ?? 'm'
         );
 
-        $pdf = Pdf::loadView('pdfs.pdf-test', [
+        $html = \Illuminate\Support\Facades\View::make('pdfs.pdf-test', [
             'data' => $questions,
             'fontSize' => $fontSize,
             'logoBackground' => $this->getLogoBackgroundPDFBase64(),
             'answerKey' => $this->answerKey
-        ], [], 'UTF-8');
+        ])->render();
+
+        $html = mb_convert_encoding($html, 'UTF-8', 'auto');
+
+        $pdf = Pdf::loadHTML($html);
+
+
+//        $pdf = Pdf::loadView('pdfs.pdf-test', [
+//            'data' => $questions,
+//            'fontSize' => $fontSize,
+//            'logoBackground' => $this->getLogoBackgroundPDFBase64(),
+//            'answerKey' => $this->answerKey
+//        ], [], 'UTF-8');
 
         return $pdf->stream('questoes.pdf');
     }
