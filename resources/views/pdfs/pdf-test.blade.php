@@ -126,7 +126,7 @@
             </div>
 
             <div class="question-description">
-                {!! $question->question !!}
+                {!! strip_tags($question->question, '<p><img><title>') !!}
             </div>
             <br>
 

@@ -45,7 +45,7 @@ class PDFTestService
             'fontSize' => $fontSize,
             'logoBackground' => $this->getLogoBackgroundPDFBase64(),
             'answerKey' => $this->answerKey
-        ]);
+        ], [], 'UTF-8');
 
         return $pdf->stream('questoes.pdf');
     }
@@ -115,7 +115,8 @@ class PDFTestService
                     ->get();
 
                 foreach ($data[$id['id']] as $key => $alternative) {
-                    $data[$id['id']][$key]['alternative'] =  strip_tags($alternative['alternative']);
+
+                    $data[$id['id']][$key]['alternative'] =  strip_tags($this->removeSpecificString($alternative['alternative']));
                     $data[$id['id']][$key]['option'] =  $this->parseKeyToABC($key);
 
                     if ($id['is_annulled'] != 1) {
@@ -211,5 +212,10 @@ class PDFTestService
         $filetype = pathinfo($filepathLogo, PATHINFO_EXTENSION);
         $getLogo = file_get_contents($filepathLogo);
         return 'data:image/' . $filetype . ';base64,' . base64_encode($getLogo);
+    }
+
+    private function removeSpecificString(string $string): string
+    {
+        return str_ireplace("Microsoft Word - Revalida_P1_2024_Prova Objetiva.docx", '', $string);
     }
 }
