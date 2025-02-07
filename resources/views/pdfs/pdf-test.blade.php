@@ -125,7 +125,7 @@
             </div>
 
             <div class="question-description">
-                {!! strip_tags($question->question, '<p><img><title>') !!}
+                {!! mb_convert_encoding(strip_tags($question->question, '<p><img><title>'), 'UTF-8', 'auto') !!}
             </div>
             <br>
 
