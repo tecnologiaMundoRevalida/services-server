@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use Normalizer;
 
 abstract class AbstractTestMockPdfService
 {
@@ -62,5 +63,17 @@ abstract class AbstractTestMockPdfService
         ];
 
         return $fontSize[$size];
+    }
+
+    public function normalizeUtf8($text)
+    {
+        // Verifica se a classe Normalizer existe e se o texto NÃO está normalizado
+        if (class_exists('Normalizer') && !Normalizer::isNormalized($text, Normalizer::FORM_C)) {
+            // Normaliza no formato de composição (NFC)
+            return Normalizer::normalize($text, Normalizer::FORM_C);
+        }
+
+        // Se já estiver normalizado ou a extensão não existir, apenas retorna como está
+        return $text;
     }
 }

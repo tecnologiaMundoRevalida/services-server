@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 class MockTestPDFService extends AbstractTestMockPdfService
 {
     private array $questionsId = [];
-    private bool $flagTags = true;
     private array $answerKey = [];
 
     public function processMockTestPdf(int $mockTestId)
@@ -61,13 +60,9 @@ class MockTestPDFService extends AbstractTestMockPdfService
                 ->select('questions.id', 'questions.ord', 'questions.question', 'questions.explanation', 'questions.discursive_response', 'questions.is_annulled', 'questions.image', 'questions.comment_image', 'institutions.name as name_institution', 'years.name as name_year')
                 ->get()[0];
 
-            $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled;
+            $data[$question->question_id]->question = $this->normalizeUtf8($data[$question->question_id]->question);
 
-            if ($this->flagTags) {
-                $data[$question->question_id]->medicine_area = $this->parseArrayToStringPDF(
-                    $this->getMedicineArea($question->question_id)
-                ) ?? null;
-            }
+            $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled;
         }
 
         return $data;
@@ -110,24 +105,5 @@ class MockTestPDFService extends AbstractTestMockPdfService
         }
 
         return $data;
-    }
-
-    private function parseArrayToStringPDF(array $data): string
-    {
-        $string = '';
-
-        foreach ($data as $name) {
-            $string .= "<span class='span-specialty'> {$name->name} </span> ";
-        }
-
-        return $string;
-    }
-
-    private function getMedicineArea(int $questionId): array
-    {
-        return DB::table('medicine_area_references')->select('medicine_areas.name')
-            ->join('medicine_areas', 'medicine_area_references.medicine_area_id', '=', 'medicine_areas.id')
-            ->where('medicine_area_references.question_id', $questionId)
-            ->get()->toArray();
     }
 }

@@ -43,22 +43,12 @@ class PDFTestService extends AbstractTestMockPdfService
         $html = \Illuminate\Support\Facades\View::make('pdfs.pdf-test', [
             'data' => $questions,
             'fontSize' => $fontSize,
+            'defaultFont' => 'DejaVu Sans',
             'logoBackground' => $this->getLogoBackgroundPDFBase64(),
             'answerKey' => $this->answerKey
         ])->render();
 
-        $html = mb_convert_encoding($html, 'UTF-8');
-
         $pdf = Pdf::loadHTML($html);
-
-
-//        $pdf = Pdf::loadView('pdfs.pdf-test', [
-//            'data' => $questions,
-//            'fontSize' => $fontSize,
-//            'logoBackground' => $this->getLogoBackgroundPDFBase64(),
-//            'answerKey' => $this->answerKey
-//        ], [], 'UTF-8');
-
         return $pdf->stream('questoes.pdf');
     }
 
@@ -100,6 +90,8 @@ class PDFTestService extends AbstractTestMockPdfService
                 ->select('questions.id', 'questions.ord', 'questions.question', 'questions.explanation', 'questions.discursive_response', 'questions.is_annulled', 'questions.image', 'questions.comment_image', 'institutions.name as name_institution', 'years.name as name_year')
                 ->get()[0];
 
+            $data[$question->question_id]->question = $this->normalizeUtf8($data[$question->question_id]->question);
+
             $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled;
 
             if ($this->flagTags) {
@@ -128,7 +120,7 @@ class PDFTestService extends AbstractTestMockPdfService
 
                 foreach ($data[$id['id']] as $key => $alternative) {
 
-                    $data[$id['id']][$key]['alternative'] =  strip_tags($this->removeSpecificString($alternative['alternative']));
+                    $data[$id['id']][$key]['alternative'] =  $this->normalizeUtf8(strip_tags($this->removeSpecificString($alternative['alternative'])));
                     $data[$id['id']][$key]['option'] =  $this->parseKeyToABC($key);
 
                     if ($id['is_annulled'] != 1) {
