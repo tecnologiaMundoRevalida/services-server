@@ -41,7 +41,7 @@ class PDFTestService
             request()->get('font_size') ?? 'm'
         );
 
-        dd($questions[21769]);
+        dd(mb_detect_encoding($questions[21769]));
 
         $html = \Illuminate\Support\Facades\View::make('pdfs.pdf-test', [
             'data' => $questions,
