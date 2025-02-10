@@ -132,7 +132,7 @@ class PDFTestService
 
                 foreach ($data[$id['id']] as $key => $alternative) {
 
-                    $data[$id['id']][$key]['alternative'] =  strip_tags($this->removeSpecificString($alternative['alternative']));
+                    $data[$id['id']][$key]['alternative'] =  self::sanitize(strip_tags($this->removeSpecificString($alternative['alternative'])));
                     $data[$id['id']][$key]['option'] =  $this->parseKeyToABC($key);
 
                     if ($id['is_annulled'] != 1) {
@@ -233,5 +233,45 @@ class PDFTestService
     private function removeSpecificString(string $string): string
     {
         return str_ireplace("Microsoft Word - Revalida_P1_2024_Prova Objetiva.docx", '', $string);
+    }
+
+    public function sanitize($texto){
+        $search = [                 // www.fileformat.info/info/unicode/<NUM>/ <NUM> = 2018
+                    "\xC2\xAB",     // « (U+00AB) in UTF-8
+                    "\xC2\xBB",     // » (U+00BB) in UTF-8
+                    "\xE2\x80\x98", // ‘ (U+2018) in UTF-8
+                    "\xE2\x80\x99", // ’ (U+2019) in UTF-8
+                    "\xE2\x80\x9A", // ‚ (U+201A) in UTF-8
+                    "\xE2\x80\x9B", // ‛ (U+201B) in UTF-8
+                    "\xE2\x80\x9C", // “ (U+201C) in UTF-8
+                    "\xE2\x80\x9D", // ” (U+201D) in UTF-8
+                    "\xE2\x80\x9E", // „ (U+201E) in UTF-8
+                    "\xE2\x80\x9F", // ‟ (U+201F) in UTF-8
+                    "\xE2\x80\xB9", // ‹ (U+2039) in UTF-8
+                    "\xE2\x80\xBA", // › (U+203A) in UTF-8
+                    "\xE2\x80\x93", // – (U+2013) in UTF-8
+                    "\xE2\x80\x94", // — (U+2014) in UTF-8
+                    "\xE2\x80\xA6"  // … (U+2026) in UTF-8
+        ];
+
+        $replacements = [
+                    "<<", 
+                    ">>",
+                    "'",
+                    "'",
+                    "'",
+                    "'",
+                    '"',
+                    '"',
+                    '"',
+                    '"',
+                    "<",
+                    ">",
+                    "-",
+                    "-",
+                    "..."
+        ];
+
+       return str_replace($search, $replacements, $string);
     }
 }
