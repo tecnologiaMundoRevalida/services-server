@@ -125,7 +125,7 @@
             </div>
 
             <div class="question-description">
-                {!! strip_tags($question->question, '<p><img><title>') !!}
+                {!! iconv("ISO-8859-1", "UTF-8", strip_tags($question->question, '<p><img><title>')) !!}
             </div>
             <br>
 
