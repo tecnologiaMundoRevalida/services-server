@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\PDFTestController;
+use App\Http\Controllers\MockTestPDFController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,5 +25,6 @@ Route::get('/', function () {
 });
 
 Route::get('/process-pdf-test/{userTestId}', [PDFTestController::class, 'processPdfTest']);
+Route::get('/process-mock-test-pdf/{mockTestId}', [MockTestPDFController::class, 'processMockTestPdf']);
 
 

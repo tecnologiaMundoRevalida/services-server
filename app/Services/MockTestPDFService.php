@@ -2,34 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\Alternative;
-use App\Models\MedicineAreaReference;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
-use App\Enums\FilterDeleteQuestionPDFTest;
 
-class PDFTestService extends AbstractTestMockPdfService
+class MockTestPDFService extends AbstractTestMockPdfService
 {
-    private array $questionsId;
-    private bool $flagTags = false;
-    private string $deleteQuestion = 'n';
+    private array $questionsId = [];
+    private bool $flagTags = true;
     private array $answerKey = [];
 
-    public function processPdfTest(int $userTestId): mixed
+    public function processMockTestPdf(int $mockTestId)
     {
-        if (request()->get('tags') === 's') {
-            $this->flagTags = true;
-        }
-
-        if (
-            request()->get('delete_question') === FilterDeleteQuestionPDFTest::RESOLVIDAS->value ||
-            request()->get('delete_question') === FilterDeleteQuestionPDFTest::CERTAS->value
-        ) {
-            $this->deleteQuestion = request()->get('delete_question');
-        }
-
-        $userTestReferences = $this->getUserTestReferences($userTestId);
-        $questions = $this->getTestQuestions($userTestReferences);
+        $mockTestReferences = $this->getMockTestReferences($mockTestId);
+        $questions = $this->getQuestions($mockTestReferences);
         $alternatives = $this->getAlternativesQuestion();
 
         foreach ($this->questionsId as $id) {
@@ -40,7 +25,7 @@ class PDFTestService extends AbstractTestMockPdfService
             request()->get('font_size') ?? 'm'
         );
 
-        $html = \Illuminate\Support\Facades\View::make('pdfs.pdf-test', [
+        $html = \Illuminate\Support\Facades\View::make('pdfs.mock-test-pdf', [
             'data' => $questions,
             'fontSize' => $fontSize,
             'logoBackground' => $this->getLogoBackgroundPDFBase64(),
@@ -51,41 +36,17 @@ class PDFTestService extends AbstractTestMockPdfService
 
         $pdf = Pdf::loadHTML($html);
 
-
-//        $pdf = Pdf::loadView('pdfs.pdf-test', [
-//            'data' => $questions,
-//            'fontSize' => $fontSize,
-//            'logoBackground' => $this->getLogoBackgroundPDFBase64(),
-//            'answerKey' => $this->answerKey
-//        ], [], 'UTF-8');
-
-        return $pdf->stream('questoes.pdf');
+        return $pdf->stream('simulado-questoes.pdf');
     }
 
-    private function getUserTestReferences(int $userTestId): array
+    private function getMockTestReferences(int $mockTestId): array
     {
-        $sql = "SELECT utr.id,
-                       utr.question_id
-                FROM user_test_references utr
-                WHERE utr.user_test_id = $userTestId";
-
-        if ($this->deleteQuestion === FilterDeleteQuestionPDFTest::RESOLVIDAS->value) {
-            $sql .= " AND utr.question_id NOT in
-                      (SELECT qa.question_id FROM user_test_questions utq, questions_answered qa
-                      WHERE utq.question_answered_id = qa.id
-					  AND utq.user_test_id = $userTestId )";
-        }
-
-        if ($this->deleteQuestion === FilterDeleteQuestionPDFTest::CERTAS->value) {
-            $sql .= " AND utr.question_id NOT in (SELECT qa.question_id FROM user_test_questions utq, questions_answered qa
-                      WHERE utq.question_answered_id = qa.id
-					  AND utq.user_test_id = $userTestId AND qa.is_correct = 1)";
-        }
-
-        return DB::select($sql);
+        return DB::table('mock_test_references')->select('id', 'question_id')
+            ->where('mock_test_id', '=', $mockTestId)
+            ->get()->toArray();
     }
 
-    private function getTestQuestions(array $questionsId): array
+    private function getQuestions(array $questionsId): array
     {
         $data = [];
 
@@ -121,22 +82,22 @@ class PDFTestService extends AbstractTestMockPdfService
                 $questionNumber++;
                 $this->answerKey[$id['id']]['question'] = $questionNumber;
 
-                $data[$id['id']] = Alternative::query()
+                $data[$id['id']] = DB::table('alternatives')
                     ->select(['id', 'alternative', 'discursive_response', 'is_correct', 'question_id'])
                     ->where('question_id', $id['id'])
-                    ->get();
+                    ->get()->toArray();
 
                 foreach ($data[$id['id']] as $key => $alternative) {
 
-                    $data[$id['id']][$key]['alternative'] =  strip_tags($this->removeSpecificString($alternative['alternative']));
-                    $data[$id['id']][$key]['option'] =  $this->parseKeyToABC($key);
+                    $data[$id['id']][$key]->alternative =  strip_tags($this->removeSpecificString($alternative->alternative));
+                    $data[$id['id']][$key]->option =  $this->parseKeyToABC($key);
 
                     if ($id['is_annulled'] != 1) {
-                        if ($alternative['is_correct']) {
+                        if ($alternative->is_correct) {
                             $this->answerKey[$id['id']]['correct_alternative'] = $this->parseKeyToABC($key);
                         }
 
-                        if ($alternative['discursive_response']) {
+                        if ($alternative->discursive_response) {
                             $this->answerKey[$id['id']]['correct_alternative'] = 'discursiva';
                         }
                     } else {
@@ -151,23 +112,22 @@ class PDFTestService extends AbstractTestMockPdfService
         return $data;
     }
 
-    private function getMedicineArea(int $questionId): array
-    {
-        return MedicineAreaReference::query()
-            ->select('medicine_areas.name')
-            ->join('medicine_areas', 'medicine_area_references.medicine_area_id', '=', 'medicine_areas.id')
-            ->where('medicine_area_references.question_id', $questionId)
-            ->get()->toArray();
-    }
-
     private function parseArrayToStringPDF(array $data): string
     {
         $string = '';
 
         foreach ($data as $name) {
-            $string .= "<span class='span-specialty'> {$name['name']} </span> ";
+            $string .= "<span class='span-specialty'> {$name->name} </span> ";
         }
 
         return $string;
+    }
+
+    private function getMedicineArea(int $questionId): array
+    {
+        return DB::table('medicine_area_references')->select('medicine_areas.name')
+            ->join('medicine_areas', 'medicine_area_references.medicine_area_id', '=', 'medicine_areas.id')
+            ->where('medicine_area_references.question_id', $questionId)
+            ->get()->toArray();
     }
 }
