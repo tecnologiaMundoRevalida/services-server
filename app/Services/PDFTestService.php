@@ -44,6 +44,7 @@ class PDFTestService
         $html = \Illuminate\Support\Facades\View::make('pdfs.pdf-test', [
             'data' => $questions,
             'fontSize' => $fontSize,
+            'defaultFont' => 'DejaVu Sans',
             'logoBackground' => $this->getLogoBackgroundPDFBase64(),
             'answerKey' => $this->answerKey
         ])->render();
