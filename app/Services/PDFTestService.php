@@ -41,6 +41,8 @@ class PDFTestService
             request()->get('font_size') ?? 'm'
         );
 
+        dd($questions);
+
         $html = \Illuminate\Support\Facades\View::make('pdfs.pdf-test', [
             'data' => $questions,
             'fontSize' => $fontSize,
