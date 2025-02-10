@@ -272,6 +272,6 @@ class PDFTestService
                     "..."
         ];
 
-       return str_replace($search, $replacements, $string);
+       return str_replace($search, $replacements, $texto);
     }
 }
