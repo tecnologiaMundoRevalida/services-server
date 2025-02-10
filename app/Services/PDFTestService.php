@@ -42,8 +42,6 @@ class PDFTestService
             request()->get('font_size') ?? 'm'
         );
 
-        // dd(mb_detect_encoding($questions[21769]->question));
-
         $html = \Illuminate\Support\Facades\View::make('pdfs.pdf-test', [
             'data' => $questions,
             'fontSize' => $fontSize,
@@ -236,24 +234,6 @@ class PDFTestService
     private function removeSpecificString(string $string): string
     {
         return str_ireplace("Microsoft Word - Revalida_P1_2024_Prova Objetiva.docx", '', $string);
-    }
-
-    public function sanitize($texto){
-        $search = [
-            "’", "‘", "“", "”",    // Aspas e apóstrofos “curvos”
-            "–", "—",               // Hífens curtos e longos
-            "…",                    // Reticências especiais
-            " ",                    // Espaço especial (non-breaking space 0xC2A0) 
-        ];
-    
-        $replace = [
-            "'", "'", "\"", "\"",   // substitui por aspas/linha reta
-            "-", "-",               // substitui hifens por hifen simples
-            "...",                  // substitui reticências
-            " ",                    // substitui espaço "especial" por espaço normal
-        ];
-
-       return str_replace($search, $replace, $texto);
     }
 
     public function normalizeUtf8($text)
