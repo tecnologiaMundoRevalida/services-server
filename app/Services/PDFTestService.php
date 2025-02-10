@@ -105,7 +105,7 @@ class PDFTestService
                 ->select('questions.id', 'questions.ord', 'questions.question', 'questions.explanation', 'questions.discursive_response', 'questions.is_annulled', 'questions.image', 'questions.comment_image', 'institutions.name as name_institution', 'years.name as name_year')
                 ->get()[0];
 
-                $data[$question->question_id]->question = $this->sanitize($data[$question->question_id]->question);
+                $data[$question->question_id]->question = $this->normalizeUtf8($data[$question->question_id]->question);
 
             $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled;
 
