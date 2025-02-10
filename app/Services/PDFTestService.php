@@ -51,7 +51,7 @@ class PDFTestService
             'answerKey' => $this->answerKey
         ])->render();
 
-        $html = mb_convert_encoding($html, 'UTF-8');
+        // $html = mb_convert_encoding($html, 'UTF-8');
 
         $pdf = Pdf::loadHTML($html);
 
