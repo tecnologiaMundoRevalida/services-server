@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Enums\FilterDeleteQuestionPDFTest;
 use Illuminate\View\View;
+use Normalizer;
 
 class PDFTestService
 {
@@ -132,7 +133,7 @@ class PDFTestService
 
                 foreach ($data[$id['id']] as $key => $alternative) {
 
-                    $data[$id['id']][$key]['alternative'] =  self::sanitize(strip_tags($this->removeSpecificString($alternative['alternative'])));
+                    $data[$id['id']][$key]['alternative'] =  $this->normalizeUtf8(strip_tags($this->removeSpecificString($alternative['alternative'])));
                     $data[$id['id']][$key]['option'] =  $this->parseKeyToABC($key);
 
                     if ($id['is_annulled'] != 1) {
@@ -251,5 +252,17 @@ class PDFTestService
         ];
 
        return str_replace($search, $replace, $texto);
+    }
+
+    public function normalizeUtf8($text)
+    {
+        // Verifica se a classe Normalizer existe e se o texto NÃO está normalizado
+        if (class_exists('Normalizer') && !Normalizer::isNormalized($text, Normalizer::FORM_C)) {
+            // Normaliza no formato de composição (NFC)
+            return Normalizer::normalize($text, Normalizer::FORM_C);
+        }
+
+        // Se já estiver normalizado ou a extensão não existir, apenas retorna como está
+        return $text;
     }
 }
