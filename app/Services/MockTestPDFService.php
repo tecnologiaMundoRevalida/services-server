@@ -64,7 +64,7 @@ class MockTestPDFService extends AbstractTestMockPdfService
                 $data[$question->question_id] = $results[0];
 
                 $data[$question->question_id]->question = $this->normalizeUtf8($data[$question->question_id]->question);
-                $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled;
+                $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled ?? 0;
             }
         }
 
