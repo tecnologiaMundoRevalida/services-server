@@ -118,7 +118,7 @@
         <div>
             <h2 class="title-question">Questão {{ $questionNumber }}  {!! $question->medicine_area ?? '' !!}</h2>
             <h4 class="subtitle-question">{{ $question->name_institution }} - {{ $question->name_year }}</h4>
-            @if($question->is_annulled)
+            @if(isset($question->is_annulled) && $question->is_annulled)
                 <span class="annulled">QUESTÃO ANULADA</span>
             @endif
         </div>
