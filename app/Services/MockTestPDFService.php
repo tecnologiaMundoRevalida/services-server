@@ -50,8 +50,6 @@ class MockTestPDFService extends AbstractTestMockPdfService
         $data = [];
 
         foreach ($questionsId as $key => $question) {
-            $this->questionsId[$key]['id'] = $question->question_id;
-
             $results = DB::table('questions')
                 ->join('tests', 'questions.test_id', '=', 'tests.id')
                 ->join('institutions', 'tests.institution_id', '=', 'institutions.id')
@@ -61,8 +59,9 @@ class MockTestPDFService extends AbstractTestMockPdfService
                 ->get();
 
             if ($results->isNotEmpty()) {
-                $data[$question->question_id] = $results[0];
+                $this->questionsId[$key]['id'] = $question->question_id;
 
+                $data[$question->question_id] = $results[0];
                 $data[$question->question_id]->question = $this->normalizeUtf8($data[$question->question_id]->question);
                 $this->questionsId[$key]['is_annulled'] = $data[$question->question_id]->is_annulled ?? 0;
             }
