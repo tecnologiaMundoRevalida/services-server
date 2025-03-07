@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Services\OpenAIService;
 use App\Http\Requests\AI\ProcessPdfRequest;
 use App\Http\Requests\AI\GenerateTagsRequest;
+use App\Http\Requests\CorrectAlternativesRequest;
 use App\Jobs\ProcessPdfTestFileJob;
 use App\Jobs\GenerateTagsForQuestionsJob;
 use App\Jobs\GenerateCommentsForQuestionsJob;
@@ -66,6 +67,22 @@ class OpenAIController extends Controller
             'message' => "Geração de Comentários Lançada na fila ...",
         ], 200);
 
+    }
+
+    public function correctAlternatives(CorrectAlternativesRequest $request)
+    {
+        // try {
+            $data = $request->validated();
+            $result = $this->openAIService->correctAlternatives($data['discursive_answers']);
+
+            return response()->json(['correction' => $result]);
+        // }
+        // catch (Exception $e) {
+        //     return response()->json([
+        //         'error' => 'Erro inesperado ao processar a correção.',
+        //         'details' => $e->getMessage()
+        //     ], 500);
+        // }
     }
 
 }
