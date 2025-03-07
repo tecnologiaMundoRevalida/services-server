@@ -112,7 +112,7 @@ class OpenAIService
                 'Authorization' => 'Bearer ' . env('DEEPSEEK_API_KEY'),
             ],
             'json' => [
-                'model' => 'deepseek-reasoner',
+                'model' => 'deepseek-chat',
                 'messages' => [
                     [
                         'role'    => 'user',
