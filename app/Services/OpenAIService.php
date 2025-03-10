@@ -85,7 +85,8 @@ class OpenAIService
        - Focado na comparação com o gabarito: se algo não estiver contemplado no gabarito, a nota deve ser 0 naquele critério/item.
        - Justifique cada nota: indique na justificativa não apenas o que foi correto, mas também o que faltou ou está incompleto.
        - Se atente a possíveis formas que podem ser aceitas como sinônimos, como sinais > para maior ou < para menor e escritas de síndromes que podem conter algum erro gramatical. 
-       - Em points você deve colocar quantos pontos vale o item avaliado.";
+       - Em points você deve colocar quantos pontos vale o item avaliado.
+       - ⁠Em questões que não possuem pontuação explicitamente definida, considere 1 ponto como padrão e seja mais flexível com sinônimos.";
 
         foreach ($discursiveAnswers as $question) {
             $prompt .= "**Questão:** " . strip_tags($question['question_text']) . "\n\n";
