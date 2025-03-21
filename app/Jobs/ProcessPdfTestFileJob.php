@@ -49,6 +49,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
             $this->assistant = AssistantAi::getAvailableAssistant();
             $this->qtd_questions_processed = isset($test->amount_questions_processed) ? ($test->amount_questions_processed > 0 ? $test->amount_questions_processed + 1 : 1) : 1;
             $client = OpenAI::client(config('services.openai.api_key'));
+            $this->deleteFile($client);
             $openAiService = new OpenAIService();
             $fileUpload = $this->uploadPdf($this->filePath,$client,$this->assistant->vector_store_id);
             if($fileUpload->filename){
@@ -242,10 +243,24 @@ class ProcessPdfTestFileJob implements ShouldQueue
 
     public function deleteFile($client){
         try{
-            $client->vectorStores()->files()->delete(
-                vectorStoreId: $this->assistant->vector_store_id,
-                fileId: $this->fileId,
-            );        
+
+             // Lista os arquivos presentes no vector store
+            $files_all = $client->vectorStores()->files()->list(
+                vectorStoreId: $this->assistant->vector_store_id
+            );
+            //OLD CODE
+            // $client->vectorStores()->files()->delete(
+            //     vectorStoreId: $this->assistant->vector_store_id,
+            //     fileId: $this->fileId,
+            // );  
+
+            // Itera sobre cada arquivo retornado e deleta
+            foreach($files_all->data as $file) {
+                $client->vectorStores()->files()->delete(
+                    vectorStoreId: $this->assistant->vector_store_id,
+                    fileId: $file->id
+                );
+            }      
         }catch(\Exception $e){
             TestProcessingLog::create(['test_id' => $this->test_id,'log' => 'error delete file:'.$this->fileId."--".$e->getMessage()]);
         }
