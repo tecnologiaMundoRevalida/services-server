@@ -71,6 +71,7 @@ class ProcessPdfTestFileJob implements ShouldQueue
     public function processPdf($client,$openAiService){
         $warning = false;
         $openAiService->updateTest($this->test_id,"PROCESSANDO",null);
+        $this->assistant->setActive(false);
         for ($this->qtd_questions_processed; $this->qtd_questions_processed <= $this->amount_questions; $this->qtd_questions_processed++) {
             $thread_id = $this->processThread($this->qtd_questions_processed,$client);
             if(isset($thread_id) && $thread_id != null && $thread_id != ""){
