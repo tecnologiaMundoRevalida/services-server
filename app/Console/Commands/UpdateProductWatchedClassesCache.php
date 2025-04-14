@@ -53,6 +53,13 @@ class UpdateProductWatchedClassesCache extends Command
         $totalProducts = count($activeProducts);
         $this->info("Processando {$totalProducts} produtos ativos");
 
+        // Primeiro, limpa os registros antigos da tabela para dados de aulas assistidas (is_global_question = 0)
+        DB::table('temp_global_score')
+            ->where('is_global_question', 0)
+            ->delete();
+        
+        $this->info("Registros antigos de aulas assistidas removidos do banco de dados");
+
         // Para cada produto, calcula o percentual global de aulas assistidas
         foreach ($activeProducts as $product) {
             $productId = $product->id;
@@ -140,16 +147,18 @@ class UpdateProductWatchedClassesCache extends Command
                 }
             }
 
-            // Armazena o resultado para este produto no Redis
-            $cacheKey = "product_watched_classes_percentage_{$productId}";
-            Redis::set($cacheKey, $globalPercentage, 'EX', 24 * 60 * 60); // Cache de 24 horas
+            // Em vez disso, armazena na tabela temp_global_score
+            DB::table('temp_global_score')->insert([
+                'product_id' => $productId,
+                'is_global_question' => 0, // indica que é dado de aulas assistidas
+                'score' => $globalPercentage,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
 
-            $this->info("Produto {$product->name} (ID: {$productId}): {$globalPercentage}%");
-        }
-
-        // Armazenamos um registro de quando o cache foi atualizado pela última vez
-        Redis::set('product_watched_classes_last_update', now()->toDateTimeString(), 'EX', 48 * 60 * 60);
+            $this->info("Produto {$product->name} (ID: {$productId}): {$globalPercentage}% - Salvo no banco de dados");
+        }        
         
-        $this->info('Cache atualizado com sucesso!');
+        $this->info('Dados salvos no banco de dados com sucesso!');
     }
 } 

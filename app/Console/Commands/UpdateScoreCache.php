@@ -261,9 +261,24 @@ class UpdateScoreCache extends Command
         $result['accuracy'] = $result['total_questions'] > 0 ?
             round(($result['correct_questions'] / $result['total_questions']) * 100, 2) : 0;
 
-        // Armazena no Redis com expiração de 24 horas
-        Redis::set('score_all_questions_all_students', json_encode($result), 'EX', 24 * 60 * 60);
+        // Primeiro, apaga registros antigos para estatísticas de questões globais
+        DB::table('temp_global_score')
+            ->where('is_global_question', 1)
+            ->delete();
+        
+        $this->info("Registros antigos de estatísticas de questões removidos do banco de dados");
 
-        return $result;
+        // Em vez de usar o Redis, armazena na tabela temp_global_score
+        DB::table('temp_global_score')->insert([
+            'product_id' => null, // conforme especificado
+            'is_global_question' => 1, // indica que são estatísticas de questões
+            'score' => $result['accuracy'], // armazena a acurácia geral
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        $this->info("Estatísticas globais de questões salvas no banco de dados: {$result['accuracy']}%");        
+
+        // return $result;
     }
 }
