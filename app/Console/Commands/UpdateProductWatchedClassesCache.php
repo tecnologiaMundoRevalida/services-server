@@ -116,7 +116,7 @@ class UpdateProductWatchedClassesCache extends Command
                             JOIN courses c ON c.id = cl.course_id
                             JOIN course_product cp ON cp.course_id = c.id
                             LEFT JOIN course_lesson_video_watched clvw ON clvw.course_lesson_video_id = clv.id AND clvw.user_id = ?
-                                AND (clvw.updated_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH) OR clvw.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH))
+                                AND clvw.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
                             WHERE cp.product_id = ?
                         ", [$user->user_id, $productId]);
 
