@@ -113,11 +113,15 @@ class UpdateProductWatchedClassesCache extends Command
                                 END as progress_percentage
                             FROM course_lesson_videos clv
                             JOIN course_lessons cl ON cl.id = clv.course_lesson_id
+					        JOIN course_week_lessons cwl ON cwl.lesson_id = cl.id
+                            JOIN course_weeks cw ON cw.id = cwl.course_week_id
                             JOIN courses c ON c.id = cl.course_id
                             JOIN course_product cp ON cp.course_id = c.id
                             LEFT JOIN course_lesson_video_watched clvw ON clvw.course_lesson_video_id = clv.id AND clvw.user_id = ?
                                 AND clvw.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
                             WHERE cp.product_id = ?
+                            AND cw.active = 1
+                            AND cw.start_date <= NOW()
                         ", [$user->user_id, $productId]);
 
                         // Calcula a soma total de progresso para todos os vídeos do usuário atual
