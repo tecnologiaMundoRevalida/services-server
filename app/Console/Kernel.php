@@ -17,6 +17,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('app:update-score-cache')
             ->dailyAt('00:00');
+            
+        $schedule->command('app:update-product-watched-classes-cache')
+            ->dailyAt('02:00');
     }
 
     /**
