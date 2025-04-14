@@ -136,14 +136,15 @@ class UpdateProductWatchedClassesCache extends Command
                         }
 
                         // Calcula a média do progresso (total de progresso / número de vídeos) para este usuário
-                        $userAverageProgress = $totalProgress / $totalVideos;
+                        // $userAverageProgress = $totalProgress / ($totalVideos * 100);
 
                         // Soma o progresso médio de cada usuário para calcular o total
-                        $totalUsersProgress += $userAverageProgress;
+                        $totalUsersProgress += $totalProgress;
                     }
 
                     // Calcula a média global de progresso para todos os usuários deste produto
-                    $globalPercentage = $userCount > 0 ? round($totalUsersProgress / $userCount, 2) : 0;
+                    // $globalPercentage = $userCount > 0 ? round($totalUsersProgress / $userCount, 2) : 0;
+                    $globalPercentage = $totalUsersProgress/($totalVideos * 100);
                 }
             }
 
