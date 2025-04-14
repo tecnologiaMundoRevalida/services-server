@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('reservations:deactivate')
                 ->dailyAt('03:00');
+
+        $schedule->command('app:update-score-cache')
+            ->dailyAt('00:00');
     }
 
     /**
